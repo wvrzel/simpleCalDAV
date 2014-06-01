@@ -17,7 +17,7 @@
  *   - simpleCalDAVchange()
  *   - simpleCalDAVgetEventsByTime()
  *   - simpleCalDAVgetTODOsByTime()
- *   - simpleCalDAVgetEntitysByUID()  (entities are events and TODOs...)
+ *   - simpleCalDAVgetByUID()
  *
  * All of those functions are realy easy to use, self-explanatory and come with a big innitial comment, which
  * explains all needed arguments and the return values.
