@@ -139,9 +139,9 @@ function simpleCalDAVdelete ( $client, $uid, $etag )
 	else { $url = $client->calendar_url; }
 	
 	// Are $uid and $etag correct? (For some reason Baikal 0.2.7 just ignores IF-match in delete requests)
-	$result = $client->GetEntryByHref( $url.$uid.'.ics' );
-	if ( count($result) == 0 ) { return array(2, 'Wrong unique ID. Can\'t find unique ID on server.', $client->GetHttpRequest(), $client->GetBody(), $client->GetResponseHeaders(), $client->GetXmlResponse()); }
-	elseif( $result[0]['etag'] != $etag ) { return array(3, 'Wrong entity tag. The entity seems to have changed.', $client->GetHttpRequest(), $client->GetBody(), $client->GetResponseHeaders(), $client->GetXmlResponse()); }
+	$result = simpleCalDAVgetByUID($client, $uid);
+	if ( $result[0] != 0 || count($result[1]) != 1 ) { return array(2, 'Wrong unique ID. Can\'t find unique ID on server.', $client->GetHttpRequest(), $client->GetBody(), $client->GetResponseHeaders(), $client->GetXmlResponse()); }
+	elseif( $result[1][0]['etag'] != $etag ) { return array(3, 'Wrong entity tag. The entity seems to have changed.', $client->GetHttpRequest(), $client->GetBody(), $client->GetResponseHeaders(), $client->GetXmlResponse()); }
 
 	// Do the deletion
 	$client->DoDELETERequest( $url.$uid.'.ics', $etag );
@@ -256,9 +256,9 @@ function simpleCalDAVchange ( $client, $cal, $etag )
 	else { $url = $client->calendar_url; }
 	
 	// Are $uid and $etag correct?
-	$result = $client->GetEntryByHref( $url.$uid.'.ics' );
-	if ( count($result) == 0 ) { return array(3, 'Wrong unique ID. Can\'t find unique ID on server.', $client->GetHttpRequest(), $client->GetBody(), $client->GetResponseHeaders(), $client->GetXmlResponse()); }
-	elseif( $result[0]['etag'] != $etag ) { return array(4, 'Wrong entity tag. The entity seems to have changed.', $client->GetHttpRequest(), $client->GetBody(), $client->GetResponseHeaders(), $client->GetXmlResponse()); }
+	$result = simpleCalDAVgetByUID($client, $uid);
+	if ( $result[0] != 0 || count($result[1]) != 1 ) { return array(3, 'Wrong unique ID. Can\'t find unique ID on server.', $client->GetHttpRequest(), $client->GetBody(), $client->GetResponseHeaders(), $client->GetXmlResponse()); }
+	elseif( $result[1][0]['etag'] != $etag ) { return array(4, 'Wrong entity tag. The entity seems to have changed.', $client->GetHttpRequest(), $client->GetBody(), $client->GetResponseHeaders(), $client->GetXmlResponse()); }
 	
 	// Put it!
 	$newEtag = $client->DoPUTRequest( $url.$uid.'.ics', $cal, $etag );

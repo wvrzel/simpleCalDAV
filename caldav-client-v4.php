@@ -21,6 +21,7 @@
  *     what it meant to do before.
  *   - Changed the CalDAVClient->GetEntryByHref()-function. No idea
  *     what it meant to do before.
+ *   - Added support for etags which are not enclosed in quotation marks
  *
  * AgenDAV is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -526,6 +527,7 @@ class CalDAVClient {
 
       $etag = null;
       if ( preg_match( '{^ETag:\s+"([^"]*)"\s*$}im', $this->httpResponseHeaders, $matches ) ) $etag = $matches[1];
+	  else if ( preg_match( '{^ETag:\s+([^\s]*)\s*$}im', $this->httpResponseHeaders, $matches ) ) $etag = $matches[1];
       if ( !isset($etag) || $etag == '' ) {
           // Try with HEAD
           $save_request = $this->httpRequest;
@@ -533,6 +535,7 @@ class CalDAVClient {
           $save_http_result = $this->httpResultCode;
           $this->DoHEADRequest( $url );
           if ( preg_match( '{^Etag:\s+"([^"]*)"\s*$}im', $this->httpResponseHeaders, $matches ) ) $etag = $matches[1];
+		  else if ( preg_match( '{^ETag:\s+([^\s]*)\s*$}im', $this->httpResponseHeaders, $matches ) ) $etag = $matches[1];
           /*
              if ( !isset($etag) || $etag == '' ) {
              printf( "Still No etag in:\n%s\n", $this->httpResponseHeaders );
@@ -1104,13 +1107,16 @@ EOFILTER;
 	  
       $etag = null;
       if ( preg_match( '{^ETag:\s+"([^"]*)"\s*$}im', $this->httpResponseHeaders, $matches ) ) $etag = $matches[1];
+	  else if ( preg_match( '{^ETag:\s+([^\s]*)\s*$}im', $this->httpResponseHeaders, $matches ) ) $etag = $matches[1];
       if ( !isset($etag) || $etag == '' ) {
           // Try with HEAD
           $save_request = $this->httpRequest;
           $save_response_headers = $this->httpResponseHeaders;
           $save_http_result = $this->httpResultCode;
-          $this->DoHEADRequest( $url );
+          $this->DoHEADRequest( $href );
           if ( preg_match( '{^Etag:\s+"([^"]*)"\s*$}im', $this->httpResponseHeaders, $matches ) ) $etag = $matches[1];
+		  else if ( preg_match( '{^ETag:\s+([^\s]*)\s*$}im', $this->httpResponseHeaders, $matches ) ) $etag = $matches[1];
+		  
           /*
              if ( !isset($etag) || $etag == '' ) {
              printf( "Still No etag in:\n%s\n", $this->httpResponseHeaders );
