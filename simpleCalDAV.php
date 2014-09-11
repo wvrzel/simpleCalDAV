@@ -340,8 +340,8 @@ function simpleCalDAVgetEventsByTime ( $client, $start = null, $finish = null )
  *              GMT. If omitted the value is set to -infinity.
  * $finish    = The end point of the time interval. Must be in the format yyyymmddThhmmssZ and should be in
  *              GMT. If omitted the value is set to +infinity.
- * $completed = Boolean whether to include completed tasks.
- * $cancelled = Boolean whether to include cancelled tasks.
+ * $completed = Only set this value if you want to filter for completed tasks (true) or for uncompleted tasks (false).
+ * $cancelled = Only set this value if you want to filter for cancelled tasks (true) or for uncancelled tasks (false).
  *
  * Return value:
  * The return value of the function is always an array.
@@ -359,7 +359,7 @@ function simpleCalDAVgetEventsByTime ( $client, $start = null, $finish = null )
  * In the case of an error the second value of the return array is the error-message. The third, fourth, fifth and
  * sixth value (if available) are additional information about the request and the server-response.
  */
-function simpleCalDAVgetTODOsByTime ( $client, $start = null, $finish = null, $completed = false, $cancelled = false )
+function simpleCalDAVgetTODOsByTime ( $client, $start = null, $finish = null, $completed = null, $cancelled = null )
 {
 	// Check for missing arguments
 	if ( ! isset($client) ) { return array(1, 'Missing arguments'); }
@@ -369,17 +369,13 @@ function simpleCalDAVgetTODOsByTime ( $client, $start = null, $finish = null, $c
 	  or ( isset($finish) and ! preg_match( '#^\d\d\d\d\d\d\d\dT\d\d\d\d\d\dZ$#', $finish, $matches ) ) )
 	{ return array(2, '$start or $finish are in the wrong format. They must have the format yyyymmddThhmmssZ and should be in GMT'); }
 	
-	// Are $completed and $cancelled booleans?
-	if ( gettype($completed) != "boolean" or gettype($cancelled) != "boolean" )
-	{ return array(3, '$completed or $cancelled are in the wrong format. They must be booleans'); }
-	
 	// Get it!
 	$results = $client->GetTodos( $start, $finish, $completed, $cancelled );
 	
 	// GET-request successfull?
 	if ( $client->GetHttpResultCode() != '207' )
 	{
-		return array(4, 'Recieved unknown HTTP status', $client->GetHttpRequest(), $client->GetBody(), $client->GetResponseHeaders(), $client->GetXmlResponse());
+		return array(3, 'Recieved unknown HTTP status', $client->GetHttpRequest(), $client->GetBody(), $client->GetResponseHeaders(), $client->GetXmlResponse());
 	}
 	
 	return array(0, $results);

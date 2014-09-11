@@ -1031,33 +1031,46 @@ EOFILTER;
    * @return array An array of the relative URLs, etags, and events, returned from DoCalendarQuery() @see DoCalendarQuery()
    */
   function GetTodos( $start, $finish, $completed = false, $cancelled = false, $relative_url = "" ) {
+  	$this->SetDepth('1');
+  	
+  	if ( isset($start) && isset($finish) )
+  		$range = "<C:time-range start=\"$start\" end=\"$finish\"/>";
+  	elseif ( isset($start) && ! isset($finish) )
+  		$range = "<C:time-range start=\"$start\"/>";
+  	elseif ( ! isset($start) && isset($finish) )
+  		$range = "<C:time-range end=\"$finish\"/>";
+  	else
+  		$range = '';
 
-      if ( $start && $finish ) {
-          $time_range = <<<EOTIME
-<C:time-range start="$start" end="$finish"/>
-EOTIME;
-      }
-
-      // Warning!  May contain traces of double negatives...
-      $neg_cancelled = ( $cancelled === true ? "no" : "yes" );
-      $neg_completed = ( $cancelled === true ? "no" : "yes" );
-
+  	
+  	// Warning!  May contain traces of double negatives...
+  	if(isset($completed) && $completed = true)
+  		$completed_filter = '<C:prop-filter name="STATUS"><C:text-match negate-condition="no">CANCELLED</C:text-match></C:prop-filter>';
+  	else if(isset($completed) && $completed = false)
+  		$completed_filter = '<C:prop-filter name="STATUS"><C:text-match negate-condition="yes">CANCELLED</C:text-match></C:prop-filter>';
+  	else
+  		$completed_filter = '';
+  	
+  	if(isset($cancelled) && $cancelled = true)
+  		$cancelled_filter = '<C:prop-filter name="STATUS"><C:text-match negate-condition="no">CANCELLED</C:text-match></C:prop-filter>';
+  	else if(isset($cancelled) && $cancelled = false)
+  		$cancelled_filter = '<C:prop-filter name="STATUS"><C:text-match negate-condition="yes">CANCELLED</C:text-match></C:prop-filter>';
+  	else
+  		$cancelled_filter = '';
+  	
       $filter = <<<EOFILTER
 <C:filter>
 <C:comp-filter name="VCALENDAR">
 <C:comp-filter name="VTODO">
-<C:prop-filter name="STATUS">
-<C:text-match negate-condition="$neg_completed">COMPLETED</C:text-match>
-</C:prop-filter>
-<C:prop-filter name="STATUS">
-<C:text-match negate-condition="$neg_cancelled">CANCELLED</C:text-match>
-</C:prop-filter>$time_range
+$completed_filter
+$cancelled_filter
+$range
 </C:comp-filter>
 </C:comp-filter>
 </C:filter>
 EOFILTER;
 
-      return $this->DoCalendarQuery($filter, $relative_url);
+      return $this->DoCalendarQuery($filter);
   }
 
 
