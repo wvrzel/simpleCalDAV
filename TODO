@@ -1,0 +1,6 @@
+Known Bugs:
+  - getTODOs: Time range filter doesn't work properly
+
+ToDo:
+  - fix bugs
+  - write some PHPUnit tests

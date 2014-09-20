@@ -104,49 +104,37 @@ DESCRIPTION:ExampleDescription1
 END:VEVENT
 END:VCALENDAR';
 
+$client = new SimpleCalDAVClient();
 
-$ret = simpleCalDAVconnect('http://yourServer/baikal/cal.php/calendars/yourUser/yourCalendar', 'username', 'password');
+try {
+	$client->connect('http://yourServer/baikal/cal.php/calendars/yourUser/yourCalendar', 'username', 'password');
+	
+	$calendars = $client->findCalendars(); // Returns an array of all accessible calendars on the server.
+	
+	// Search for the right calendar
+	foreach($calendars as $calendar) if($calendar->getCalendarID == 'myCalendar') { $myCalendar = $calendar; break; }
+	if(!isset($myCalendar)) die('Could not accsess my calendar.');
+	
+	$client->setCalendar($myCalendar);
+	
+	$firstNewEventOnServer = $client->create($firstNewEvent); // Creates $firstNewEvent on the server and a CalDAVObject representing the event.
+	$secondNewEventOnServer = $client->create($secondNewEvent); // Creates $firstNewEvent on the server and a CalDAVObject representing the event.
 
-if ($ret[0] == 0) // Everything worked well
-{
-	$client = $ret[1];
-	
-	$ret = simpleCalDAVcreate($client, $firstNewEvent); // Creates $firstNewEvent on the server and returns array(0, 'etag of first event').
-	$etagOfFirstEvent = $ret[1];
-	$ret = simpleCalDAVcreate($client, $secondNewEvent); // Creates $secondNewEvent on the server and returns array(0, 'etag of second event').
-	$etagOfSecondEvent = $ret[1];
-	
-	$ret = simpleCalDAVgetByUID ($client, 'ExampleUID1'); // Returns array(0, array(array( 'href'=>'something.ics', 'data'=>$firstNewEvent, 'etag'=>'etag of first event'))).
-	
-	$ret = simpleCalDAVgetEventsByTime($client, '20140418T103000Z', '20140419T200000Z');
-	/* Returns array(0, array(
-	 * 							array( 'href'=>'something.ics', 'data'=>$firstNewEvent, 'etag'=>'etag of first event'),
-	 *							array( 'href'=>'someOtherThing.ics', 'data'=>$secondNewEvent, 'etag'=>'etag of second event'))).
-	 */
-	
-	$ret = simpleCalDAVchange($client, $changedFirstEvent, $etagOfFirstEvent); // Change the first event on the server from $firstNewEvent to $changedFirstEvent
-	$etagOfFirstEvent = $ret[1];											   // and return array(0, 'new etag of first event').
-	
-	$ret = simpleCalDAVgetByUID ($client, 'ExampleUID1');
-	// Returns array(0, array( 'href'=>'something.ics', 'data'=>$changedFirstEvent, 'etag'=>'new etag of first event')).
-	
-	$ret = simpleCalDAVgetEventsByTime($client, '20140418T103000Z', '20140419T200000Z');
-	// Returns array(0, array(array( 'href'=>'someOtherThing.ics', 'data'=>$secondNewEvent, 'etag'=>'etag of second event'))).
-	
-	$ret = simpleCalDAVdelete($client, 'ExampleUID2', $etagOfSecondEvent); // Deletes the second event from the server and returns array(0).
-	
-	$ret = simpleCalDAVgetEventsByTime($client, '20140418T103000Z', '20140419T200000Z'); // Returns array(0, array()).
+	$client->getEvents('20140418T103000Z', '20140419T200000Z'); // Returns array($firstNewEventOnServer, $secondNewEventOnServer);
+
+	$firstNewEventOnServer = $client->change($firstNewEventOnServer->getHref(),$changedFirstEvent, $firstNewEventOnServer->getEtag());
+	// Change the first event on the server from $firstNewEvent to $changedFirstEvent
+	// and overwrite $firstNewEventOnServer with the new representation of the changed event on the server.
+
+	$client->getEvents('20140418T103000Z', '20140419T200000Z'); // Returns array($secondNewEventOnServer);
+
+	$client->delete($secondNewEventOnServer->getHref(), $secondNewEventOnServer->getEtag()); // Deletes the second new event from the server.
+
+	$client->getEvents('20140418T103000Z', '20140419T200000Z'); // Returns an empty array
 }
 
-else
-{
-	echo '<pre>';
-	echo $ret[1].'<br><br>';
-	echo 'Request-Header:<br>'.$ret[2].'<br><br>';
-	echo 'Request-Body:<br>'.htmlentities($ret[3]).'<br><br>';
-	echo 'Resonse-Header:<br>'.$ret[4].'<br><br>';
-	echo 'XML-Response-Body:<br>'.htmlentities($ret[5]);
-	echo '</pre>';
+catch (Exception $e) {
+	echo $e->__toString();
 }
 
 ?>
