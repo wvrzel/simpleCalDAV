@@ -1144,7 +1144,7 @@ EOFILTER;
                           break;
                       case 'http://apple.com/ns/ical/:calendar-color':
                           $calendar->setRBGcolor((isset($v['value']) ? 
-                          		$this->_rgba2rgb($rgba_color) : '-'));
+                          		$this->_rgba2rgb($v['value']) : '-'));
                           break;
                       case 'http://apple.com/ns/ical/:calendar-order':
                           $calendar->setOrder((isset($v['value']) ?

@@ -107,27 +107,54 @@ END:VCALENDAR';
 $client = new SimpleCalDAVClient();
 
 try {
-	$client->connect('http://localhost/baikal/cal.php/calendars/', 'mischa', '123456');
+	/*
+	 * To establish a connection and to choose a calendar on the server, use
+	 * connect()
+	 * findCalendars()
+	 * setCalendar()
+	 */
 	
-	$calendars = $client->findCalendars(); // Returns an array of all accessible calendars on the server.
+	$client->connect('http://yourServer/baikal/cal.php/calendars/yourUser/yourCalendar', 'username', 'password');
 	
-	$client->setCalendar($calendars["gemeinsam"]); // Here: Use the calendar ID of your choice. If you don't know which calendar ID to use, see config/listCalendars.php
+	$arrayOfCalendars = $client->findCalendars(); // Returns an array of all accessible calendars on the server.
+	
+	$client->setCalendar($arrayOfCalendars["myCalendarID"]); // Here: Use the calendar ID of your choice. If you don't know which calendar ID to use, try config/listCalendars.php
+	
+	/*
+	 * You can create calendar objects (e.g. events, todos,...) on the server with create().
+	 * Just pass a string with the iCalendar-data which should be saved on the server.
+	 * The function returns a CalDAVObject (see CalDAVObject.php) with the stored information about the new object on the server
+	 */
 	
 	$firstNewEventOnServer = $client->create($firstNewEvent); // Creates $firstNewEvent on the server and a CalDAVObject representing the event.
 	$secondNewEventOnServer = $client->create($secondNewEvent); // Creates $firstNewEvent on the server and a CalDAVObject representing the event.
 
+	/*
+	 * You can getEvents with getEvents()
+	 */
 	$client->getEvents('20140418T103000Z', '20140419T200000Z'); // Returns array($firstNewEventOnServer, $secondNewEventOnServer);
 
+	/*
+	 * An CalDAVObject $o has three attributes
+	 * $o->href: Link to the object on the server
+	 * $o->data: The iCalendar-data describing the object
+	 * $o->etag: see CalDAVObject.php
+	 * 
+	 * $o->href and $o->etag can be used to change or to delete the object.
+	 * $o->data can be processed further on, e.g. printed
+	 */
+	
 	$firstNewEventOnServer = $client->change($firstNewEventOnServer->getHref(),$changedFirstEvent, $firstNewEventOnServer->getEtag());
 	// Change the first event on the server from $firstNewEvent to $changedFirstEvent
 	// and overwrite $firstNewEventOnServer with the new representation of the changed event on the server.
 
-	$client->getEvents('20140418T103000Z', '20140419T200000Z'); // Returns array($secondNewEventOnServer);
+	$events = $client->getEvents('20140418T103000Z', '20140419T200000Z'); // Returns array($secondNewEventOnServer);
 
+	echo $events[0]->data; // Prints $secondNewEvent. See CalDAVObject.php
+	
 	$client->delete($secondNewEventOnServer->getHref(), $secondNewEventOnServer->getEtag()); // Deletes the second new event from the server.
 
 	$client->getEvents('20140418T103000Z', '20140419T200000Z'); // Returns an empty array
-	echo '<pre>';var_dump($client->getEvents());echo '</pre>';
 }
 
 catch (Exception $e) {
