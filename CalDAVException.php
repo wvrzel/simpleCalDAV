@@ -34,7 +34,9 @@ class CalDAVException extends Exception {
 		$dom->formatOutput = TRUE;
 		
 		$string .= '<pre>';
-		$string .= 'Exception: '.$this->getMessage().'<br><br>';
+		$string .= 'Exception: '.$this->getMessage().'<br><br><br><br>';
+		$string .= 'If you think there is a bug in SimpleCalDAV, please report the following information on github or send it at palm.michael@gmx.de.<br><br><br>';
+		$string .= '<br>For debugging purposes:<br>';
 		$string .= '<br>last request:<br><br>';
 		
     	$string .= $this->requestHeader;

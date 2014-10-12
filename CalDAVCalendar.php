@@ -36,12 +36,11 @@ class CalDAVCalendar {
 	private $rbg_color;
 	private $order;
 	
-	function __construct ( $url, $displayname = null, $ctag = null, $calendar_id = null, $rgba_color = null, $rbg_color = null, $order = null ) {
+	function __construct ( $url, $displayname = null, $ctag = null, $calendar_id = null, $rbg_color = null, $order = null ) {
 		$this->url = $url;
 		$this->displayname = $displayname;
 		$this->ctag = $ctag;
 		$this->calendar_id = $calendar_id;
-		$this->rgba_color = $rgba_color;
 		$this->rbg_color = $rbg_color;
 		$this->order = $order;
 	}
@@ -68,10 +67,6 @@ class CalDAVCalendar {
 		return $this->calendar_id;
 	}
 	
-	function getRGBAcolor () {
-		return $this->rgba_color;
-	}
-	
 	function getRBGcolor () {
 		return $this->rbg_color;
 	}
@@ -84,31 +79,27 @@ class CalDAVCalendar {
 	// Setters
 	
 	function setURL ( $url ) {
-		$this->url;
+		$this->url = $url;
 	}
 	
 	function setDisplayName ( $displayname ) {
-		$this->displayname;
+		$this->displayname = $displayname;
 	}
 	
 	function setCtag ( $ctag ) {
-		$this->ctag;
+		$this->ctag = $ctag;
 	}
 	
 	function setCalendarID ( $calendar_id ) {
-		$this->calendar_id;
-	}
-	
-	function setRGBAcolor ( $rgba_color ) {
-		$this->rgba_color;
+		$this->calendar_id = $calendar_id;
 	}
 	
 	function setRBGcolor ( $rbg_color ) {
-		$this->rbg_color;
+		$this->rbg_color = $rbg_color;
 	}
 	
 	function setOrder ( $order ) {
-		$this->order;
+		$this->order = $order;
 	}
 }
 

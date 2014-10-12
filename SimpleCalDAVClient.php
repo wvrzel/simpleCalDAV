@@ -71,24 +71,35 @@ class SimpleCalDAVClient {
 		// Valid CalDAV-Server? Or is it just a WebDAV-Server?
 		if( ! $client->isValidCalDAVServer() )
 		{
-			throw new CalDAVException('Could\'n find a CalDAV-collection under the url', $client->GetHttpRequest(), $client->GetBody(), $client->GetResponseHeaders(), $client->GetXmlResponse());
+			
+			if( $client->GetHttpResultCode() == '401' ) // unauthorisized
+			{
+					throw new CalDAVException('Login failed', $client);
+			}
+			
+			elseif( $client->GetHttpResultCode() == '' ) // can't reach server
+			{
+					throw new CalDAVException('Can\'t reach server', $client);
+			}
+			
+			else throw new CalDAVException('Could\'n find a CalDAV-collection under the url', $client);
 		}
-	
+		
 		// Check for errors
 		if( $client->GetHttpResultCode() != '200' ) {
 			if( $client->GetHttpResultCode() == '401' ) // unauthorisized
 			{
-				throw new CalDAVException('Login failed', $client->GetHttpRequest(), $client->GetBody(), $client->GetResponseHeaders(), $client->GetXmlResponse());
+				throw new CalDAVException('Login failed', $client);
 			}
-	
+		
 			elseif( $client->GetHttpResultCode() == '' ) // can't reach server
 			{
-				throw new CalDAVException('Can\'t reach server', $client->GetHttpRequest(), $client->GetBody(), $client->GetResponseHeaders(), $client->GetXmlResponse());
+				throw new CalDAVException('Can\'t reach server', $client);
 			}
-	
+		
 			else // Unknown status
 			{
-				throw new CalDAVException('Recieved unknown HTTP status while checking the connection after establishing it', $client->GetHttpRequest(), $client->GetBody(), $client->GetResponseHeaders(), $client->GetXmlResponse());
+				throw new CalDAVException('Recieved unknown HTTP status while checking the connection after establishing it', $client);
 			}
 		}
 	
@@ -212,16 +223,16 @@ class SimpleCalDAVClient {
 		else { $url = $this->client->calendar_url; }
 	
 		// Does $href exist?
-		$result = $this->client->GetEntryByHref($url.$href);
+		$result = $this->client->GetEntryByHref($href);
 		if ( $this->client->GetHttpResultCode() == '200' ); 
-		else if ( $this->client->GetHttpResultCode() == '404' ) throw new CalDAVException('Can\'t find '.$url.$href.' on the server', $this->client);
+		else if ( $this->client->GetHttpResultCode() == '404' ) throw new CalDAVException('Can\'t find '.$href.' on the server', $this->client);
 		else throw new CalDAVException('Recieved unknown HTTP status', $this->client);
 		
 		// $etag correct?
 		if($result[0]['etag'] != $etag) { throw new CalDAVException('Wrong entity tag. The entity seems to have changed.', $this->client); }
 	
 		// Put it!
-		$newEtag = $this->client->DoPUTRequest( $url.$href, $new_data, $etag );
+		$newEtag = $this->client->DoPUTRequest( $href, $new_data, $etag );
 		
 		// PUT-request successfull?
 		if ( $this->client->GetHttpResultCode() != '204' && $this->client->GetHttpResultCode() != '200' )
@@ -229,7 +240,7 @@ class SimpleCalDAVClient {
 			throw new CalDAVException('Recieved unknown HTTP status', $this->client);
 		}
 		
-		return new CalDAVObject($url.$href, $new_data, $etag);
+		return new CalDAVObject($href, $new_data, $etag);
 	}
 	
 	/**
@@ -255,14 +266,14 @@ class SimpleCalDAVClient {
 		else { $url = $this->client->calendar_url; }
 	
 		// Does $href exist?
-		$result = $this->client->GetEntryByHref($url.$href);
-		if(count($result) == 0) throw new CalDAVException('Can\'t find '.$url.$href.'on server', $this->client);
+		$result = $this->client->GetEntryByHref($href);
+		if(count($result) == 0) throw new CalDAVException('Can\'t find '.$href.'on server', $this->client);
 		
 		// $etag correct?
 		if($result[0]['etag'] != $etag) { throw new CalDAVException('Wrong entity tag. The entity seems to have changed.', $this->client); }
 	
 		// Do the deletion
-		$this->client->DoDELETERequest($url.$href, $etag);
+		$this->client->DoDELETERequest($href, $etag);
 	
 		// Deletion successfull?
 		if ( $this->client->GetHttpResultCode() != '200' and $this->client->GetHttpResultCode() != '204' )

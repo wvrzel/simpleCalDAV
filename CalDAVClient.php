@@ -1128,33 +1128,31 @@ EOFILTER;
                */
               $pieces = preg_split('/\//', $href);
               $total = count($pieces);
-              $calendar_id = $pieces[$total-3] . ':' . $pieces[$total-2];
-              $calendar->calendar = $calendar_id;
+              $calendar_id = $pieces[$total-2];
+              $calendar->setCalendarID($calendar_id);
 
               $ok_props = $this->GetOKProps($hnode);
               foreach( $ok_props AS $v ) {
                   switch( $v['tag'] ) {
                       case 'http://calendarserver.org/ns/:getctag':
-                          $calendar->setCtag(isset($v['value']) ?
-                              $v['value'] : '');
+                          $calendar->setCtag((isset($v['value']) ?
+                              $v['value'] : '-'));
                           break;
                       case 'DAV::displayname':
-                          $calendar->setDisplayName(isset($v['value']) ?
-                              $v['value'] : 'calendar');
+                          $calendar->setDisplayName((isset($v['value']) ?
+                              $v['value'] : '-'));
                           break;
                       case 'http://apple.com/ns/ical/:calendar-color':
-                          $rgba_color = isset($v['value']) ?
-                              $v['value'] : '#ffffffff';
-                          $calendar->setRGBAcolor($rgba_color);
-                          $calendar->setRBGcolor($this->_rgba2rgb($rgba_color));
+                          $calendar->setRBGcolor((isset($v['value']) ? 
+                          		$this->_rgba2rgb($rgba_color) : '-'));
                           break;
                       case 'http://apple.com/ns/ical/:calendar-order':
-                          $calendar->setOrder(isset($v['value']) ?
-                              $v['value'] : '1');
+                          $calendar->setOrder((isset($v['value']) ?
+                              $v['value'] : '-'));
                           break;
                   }
               }
-              $calendars[] = $calendar;
+              $calendars[$calendar->getCalendarID()] = $calendar;
           }
       }
 

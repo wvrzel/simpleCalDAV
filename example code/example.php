@@ -1,6 +1,6 @@
 <?php
 
-require_once('../simpleCalDAV.php');
+require_once('../SimpleCalDAVClient.php');
 
 $firstNewEvent = 'BEGIN:VCALENDAR
 PRODID:-//SomeExampleStuff//EN
@@ -107,15 +107,11 @@ END:VCALENDAR';
 $client = new SimpleCalDAVClient();
 
 try {
-	$client->connect('http://yourServer/baikal/cal.php/calendars/yourUser/yourCalendar', 'username', 'password');
+	$client->connect('http://localhost/baikal/cal.php/calendars/', 'mischa', '123456');
 	
 	$calendars = $client->findCalendars(); // Returns an array of all accessible calendars on the server.
 	
-	// Search for the right calendar
-	foreach($calendars as $calendar) if($calendar->getCalendarID == 'myCalendar') { $myCalendar = $calendar; break; }
-	if(!isset($myCalendar)) die('Could not accsess my calendar.');
-	
-	$client->setCalendar($myCalendar);
+	$client->setCalendar($calendars["gemeinsam"]); // Here: Use the calendar ID of your choice. If you don't know which calendar ID to use, see config/listCalendars.php
 	
 	$firstNewEventOnServer = $client->create($firstNewEvent); // Creates $firstNewEvent on the server and a CalDAVObject representing the event.
 	$secondNewEventOnServer = $client->create($secondNewEvent); // Creates $firstNewEvent on the server and a CalDAVObject representing the event.
@@ -131,6 +127,7 @@ try {
 	$client->delete($secondNewEventOnServer->getHref(), $secondNewEventOnServer->getEtag()); // Deletes the second new event from the server.
 
 	$client->getEvents('20140418T103000Z', '20140419T200000Z'); // Returns an empty array
+	echo '<pre>';var_dump($client->getEvents());echo '</pre>';
 }
 
 catch (Exception $e) {
