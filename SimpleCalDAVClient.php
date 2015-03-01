@@ -368,42 +368,6 @@ class SimpleCalDAVClient {
 	}
 	
 	/**
-	 * function getEntriesByUID()
-	 * Gets a all Events and TODOs from the CalDAV-Server which UIDs contain the given string.
-	 *
-	 * Arguments:
-	 * @param $search The string to search for
-	 *
-	 * Return value:
-	 * @return an array of CalDAVObjects (See CalDAVObject.php), representing the found Events and TODOs.
-	 *
-	 * Debugging:
-	 * @throws CalDAVException
-	 * For debugging purposes, just sorround everything with try { ... } catch (Exception $e) { echo $e->__toString(); exit(-1); }
-	 */
-	function getEntriesByUID ( $search )
-	{
-		// Connection and calendar set?
-		if(!isset($this->client)) throw new Exception('No connection. Try connect().');
-		if(!isset($this->client->calendar_url)) throw new Exception('No calendar selected. Try findCalendars() and setCalendar().');
-	
-		// Get it!
-		$results = $this->client->GetEntryByUid($search);
-		throw new CalDAVException('Recieved unknown HTTP status', $this->client);
-		// GET-request successfull?
-		if ( $this->client->GetHttpResultCode() != '207' ) // TODO: Additional ERROR-Codes for Filters?
-		{
-			throw new CalDAVException('Recieved unknown HTTP status', $this->client);
-		}
-	
-		// Reformat
-		$report = array();
-		foreach($results as $event) $report[] = new CalDAVObject($this->url.$event['href'], $event['data'], $event['etag']);
-	
-		return $report;
-	}
-	
-	/**
 	 * function getCustomReport()
      * Sends a custom request to the server
 	 * (Sends a REPORT-request with a custom <C:filter>-tag)
