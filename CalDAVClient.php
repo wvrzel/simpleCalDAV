@@ -1046,9 +1046,11 @@ EOFILTER;
           $filter = <<<EOFILTER
 <C:filter>
 <C:comp-filter name="VCALENDAR">
+<C:comp-filter name="VEVENT">
 <C:prop-filter name="UID">
 <C:text-match icollation="i;octet">$uid</C:text-match>
 </C:prop-filter>
+</C:comp-filter>
 </C:comp-filter>
 </C:filter>
 EOFILTER;

@@ -44,6 +44,7 @@
 
 require_once('CalDAVClient.php');
 require_once('CalDAVException.php');
+require_once('CalDAVFilter.php');
 require_once('CalDAVObject.php');
 
 class SimpleCalDAVClient {
@@ -282,7 +283,7 @@ class SimpleCalDAVClient {
 	 * Arguments:
 	 * @param $start The starting point of the time interval. Must be in the format yyyymmddThhmmssZ and should be in
 	 *           		GMT. If omitted the value is set to -infinity.
-	 * @param $finish The end point of the time interval. Must be in the format yyyymmddThhmmssZ and should be in
+	 * @param $end The end point of the time interval. Must be in the format yyyymmddThhmmssZ and should be in
 	 *           		GMT. If omitted the value is set to +infinity.
 	 *
 	 * Return value:
@@ -292,19 +293,19 @@ class SimpleCalDAVClient {
 	 * @throws CalDAVException
 	 * For debugging purposes, just sorround everything with try { ... } catch (Exception $e) { echo $e->__toString(); exit(-1); }
 	 */
-	function getEvents ( $start = null, $finish = null )
+	function getEvents ( $start = null, $end = null )
 	{
 		// Connection and calendar set?
 		if(!isset($this->client)) throw new Exception('No connection. Try connect().');
 		if(!isset($this->client->calendar_url)) throw new Exception('No calendar selected. Try findCalendars() and setCalendar().');
 		
-		// Are $start and $finish in the correct format?
+		// Are $start and $end in the correct format?
 		if ( ( isset($start) and ! preg_match( '#^\d\d\d\d\d\d\d\dT\d\d\d\d\d\dZ$#', $start, $matches ) )
-		  or ( isset($finish) and ! preg_match( '#^\d\d\d\d\d\d\d\dT\d\d\d\d\d\dZ$#', $finish, $matches ) ) )
-		{ trigger_error('$start or $finish are in the wrong format. They must have the format yyyymmddThhmmssZ and should be in GMT', E_USER_ERROR); }
+		  or ( isset($end) and ! preg_match( '#^\d\d\d\d\d\d\d\dT\d\d\d\d\d\dZ$#', $end, $matches ) ) )
+		{ trigger_error('$start or $end are in the wrong format. They must have the format yyyymmddThhmmssZ and should be in GMT', E_USER_ERROR); }
 	
 		// Get it!
-		$results = $this->client->GetEvents( $start, $finish );
+		$results = $this->client->GetEvents( $start, $end );
 	
 		// GET-request successfull?
 		if ( $this->client->GetHttpResultCode() != '207' )
@@ -327,7 +328,7 @@ class SimpleCalDAVClient {
 	 * Arguments:
 	 * @param $start The starting point of the time interval. Must be in the format yyyymmddThhmmssZ and should be in
 	 *              	GMT. If omitted the value is set to -infinity.
-	 * @param $finish The end point of the time interval. Must be in the format yyyymmddThhmmssZ and should be in
+	 * @param $end The end point of the time interval. Must be in the format yyyymmddThhmmssZ and should be in
 	 *              	GMT. If omitted the value is set to +infinity.
 	 * @param $complete Filter for completed tasks (true) or for uncompleted tasks (false). If omitted, the function will return both.
 	 * @param $cancelled Filter for cancelled tasks (true) or for uncancelled tasks (false). If omitted, the function will return both.
@@ -339,19 +340,19 @@ class SimpleCalDAVClient {
 	 * @throws CalDAVException
 	 * For debugging purposes, just sorround everything with try { ... } catch (Exception $e) { echo $e->__toString(); exit(-1); }
 	 */
-	function getTODOs ( $start = null, $finish = null, $completed = null, $cancelled = null )
+	function getTODOs ( $start = null, $end = null, $completed = null, $cancelled = null )
 	{
 		// Connection and calendar set?
 		if(!isset($this->client)) throw new Exception('No connection. Try connect().');
 		if(!isset($this->client->calendar_url)) throw new Exception('No calendar selected. Try findCalendars() and setCalendar().');
 	
-		// Are $start and $finish in the correct format?
+		// Are $start and $end in the correct format?
 		if ( ( isset($start) and ! preg_match( '#^\d\d\d\d\d\d\d\dT\d\d\d\d\d\dZ$#', $start, $matches ) )
-		  or ( isset($finish) and ! preg_match( '#^\d\d\d\d\d\d\d\dT\d\d\d\d\d\dZ$#', $finish, $matches ) ) )
-		{ trigger_error('$start or $finish are in the wrong format. They must have the format yyyymmddThhmmssZ and should be in GMT', E_USER_ERROR); }
+		  or ( isset($end) and ! preg_match( '#^\d\d\d\d\d\d\d\dT\d\d\d\d\d\dZ$#', $end, $matches ) ) )
+		{ trigger_error('$start or $end are in the wrong format. They must have the format yyyymmddThhmmssZ and should be in GMT', E_USER_ERROR); }
 	
 		// Get it!
-		$results = $this->client->GetTodos( $start, $finish, $completed, $cancelled );
+		$results = $this->client->GetTodos( $start, $end, $completed, $cancelled );
 		
 		// GET-request successfull?
 		if ( $this->client->GetHttpResultCode() != '207' )
@@ -388,7 +389,7 @@ class SimpleCalDAVClient {
 	
 		// Get it!
 		$results = $this->client->GetEntryByUid($search);
-		
+		throw new CalDAVException('Recieved unknown HTTP status', $this->client);
 		// GET-request successfull?
 		if ( $this->client->GetHttpResultCode() != '207' ) // TODO: Additional ERROR-Codes for Filters?
 		{
@@ -404,12 +405,15 @@ class SimpleCalDAVClient {
 	
 	/**
 	 * function getCustomReport()
-	 * Sends a REPORT-request with a custom <C:filter>-tag.
+     * Sends a custom request to the server
+	 * (Sends a REPORT-request with a custom <C:filter>-tag)
 	 * 
-	 * See http://www.rfcreader.com/#rfc4791_line1524 for more information about how to write filters.
+     * You can either write the filterXML yourself or build an CalDAVFilter-object (see CalDAVFilter.php).
+     *
+	 * See http://www.rfcreader.com/#rfc4791_line1524 for more information about how to write filters on your own.
 	 * 
 	 * Arguments:
-	 * @param $filter The stuff, you want to send encapsulated in the <C:filter>-tag.
+	 * @param $filterXML The stuff, you want to send encapsulated in the <C:filter>-tag.
 	 * 
 	 * Return value:
 	 * @return an array of CalDAVObjects (See CalDAVObject.php), representing the found calendar resources.
@@ -418,7 +422,7 @@ class SimpleCalDAVClient {
 	 * @throws CalDAVException
 	 * For debugging purposes, just sorround everything with try { ... } catch (Exception $e) { echo $e->__toString(); exit(-1); }
 	 */
-	function getCustomReport ( $filter )
+	function getCustomReport ( $filterXML )
 	{
 		// Connection and calendar set?
 		if(!isset($this->client)) throw new Exception('No connection. Try connect().');
@@ -428,8 +432,8 @@ class SimpleCalDAVClient {
 		$this->client->SetDepth('1');
 		
 		// Get it!
-		$results = $this->client->DoCalendarQuery('<C:filter>'.$filter.'</C:filter>');
-		throw new CalDAVException('', $this->client);
+		$results = $this->client->DoCalendarQuery('<C:filter>'.$filterXML.'</C:filter>');
+		
 		// GET-request successfull?
 		if ( $this->client->GetHttpResultCode() != '207' )
 		{
