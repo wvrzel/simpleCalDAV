@@ -47,7 +47,8 @@ require_once('CalDAVException.php');
 require_once('CalDAVObject.php');
 
 class SimpleCalDAVClient {
-	private  $client;
+	private $client;
+    private $url;
 	
 	/**
 	 * function connect()
@@ -139,6 +140,10 @@ class SimpleCalDAVClient {
 		if(!isset($this->client)) throw new Exception('No connection. Try connect().');
 		
 		$this->client->SetCalendar($this->client->first_url_part.$calendar->getURL());
+        
+        // Is there a '/' at the end of the calendar_url?
+		if ( ! preg_match( '#^.*?/$#', $this->client->calendar_url, $matches ) ) { $this->url = $this->client->calendar_url.'/'; }
+		else { $this->url = $this->client->calendar_url; }
 	}
 	
 	/**
@@ -166,25 +171,21 @@ class SimpleCalDAVClient {
 		if (! preg_match( '#^UID:(.*?)\r?\n?$#m', $cal, $matches ) ) { throw new Exception('Can\'t find UID in $cal'); }
 		else { $uid = $matches[1]; }
 	
-		// Is there a '/' at the end of the calendar_url?
-		if ( ! preg_match( '#^.*?/$#', $this->client->calendar_url, $matches ) ) { $url = $this->client->calendar_url.'/'; }
-		else { $url = $this->client->calendar_url; }
-	
-		// Does $url.$uid.'.ics' already exist?
-		$result = $this->client->GetEntryByHref( $url.$uid.'.ics' );
-		if ( $this->client->GetHttpResultCode() == '200' ) { throw new CalDAVException($url.$uid.'.ics already exists. UID not unique?', $this->client); }
+		// Does $this->url.$uid.'.ics' already exist?
+		$result = $this->client->GetEntryByHref( $this->url.$uid.'.ics' );
+		if ( $this->client->GetHttpResultCode() == '200' ) { throw new CalDAVException($this->url.$uid.'.ics already exists. UID not unique?', $this->client); }
 		else if ( $this->client->GetHttpResultCode() == '404' );
 		else throw new CalDAVException('Recieved unknown HTTP status', $this->client);
 		
 		// Put it!
-		$newEtag = $this->client->DoPUTRequest( $url.$uid.'.ics', $cal );
+		$newEtag = $this->client->DoPUTRequest( $this->url.$uid.'.ics', $cal );
 	
 		// PUT-request successfull?
 		if ( $this->client->GetHttpResultCode() != '201' )
 		{
 			if ( $this->client->GetHttpResultCode() == '204' ) // $url.$uid.'.ics' already existed on server
 			{
-				throw new CalDAVException( $url.$uid.'.ics already existed. Entry has been overwritten.', $this->client);
+				throw new CalDAVException( $this->url.$uid.'.ics already existed. Entry has been overwritten.', $this->client);
 			}
 	
 			else // Unknown status
@@ -193,7 +194,7 @@ class SimpleCalDAVClient {
 			}
 		}
 	
-		return new CalDAVObject($url.$uid.'.ics', $cal, $newEtag);
+		return new CalDAVObject($this->url.$uid.'.ics', $cal, $newEtag);
 	}
 	
 	/**
@@ -218,10 +219,6 @@ class SimpleCalDAVClient {
 		if(!isset($this->client)) throw new Exception('No connection. Try connect().');
 		if(!isset($this->client->calendar_url)) throw new Exception('No calendar selected. Try findCalendars() and setCalendar().');
 	
-		// Is there a '/' at the end of the url?
-		if ( ! preg_match( '#^.*?/$#', $this->client->calendar_url, $matches ) ) { $url = $this->client->calendar_url.'/'; }
-		else { $url = $this->client->calendar_url; }
-	
 		// Does $href exist?
 		$result = $this->client->GetEntryByHref($href);
 		if ( $this->client->GetHttpResultCode() == '200' ); 
@@ -240,7 +237,7 @@ class SimpleCalDAVClient {
 			throw new CalDAVException('Recieved unknown HTTP status', $this->client);
 		}
 		
-		return new CalDAVObject($href, $new_data, $etag);
+		return new CalDAVObject($href, $new_data, $newEtag);
 	}
 	
 	/**
@@ -260,10 +257,6 @@ class SimpleCalDAVClient {
 		// Connection and calendar set?
 		if(!isset($this->client)) throw new Exception('No connection. Try connect().');
 		if(!isset($this->client->calendar_url)) throw new Exception('No calendar selected. Try findCalendars() and setCalendar().');
-	
-		// Is there a '/' at the end of the url?
-		if ( ! preg_match( '#^.*?/$#', $this->client->calendar_url, $matches ) ) { $url = $this->client->calendar_url.'/'; }
-		else { $url = $this->client->calendar_url; }
 	
 		// Does $href exist?
 		$result = $this->client->GetEntryByHref($href);
@@ -321,7 +314,7 @@ class SimpleCalDAVClient {
 		
 		// Reformat
 		$report = array();
-		foreach($results as $event) $report[] = new CalDAVObject($event['href'], $event['data'], $event['etag']);
+		foreach($results as $event) $report[] = new CalDAVObject($this->url.$event['href'], $event['data'], $event['etag']);
 	
 		return $report;
 	}
@@ -359,7 +352,7 @@ class SimpleCalDAVClient {
 	
 		// Get it!
 		$results = $this->client->GetTodos( $start, $finish, $completed, $cancelled );
-		throw new CalDAVException('', $this->client);
+		
 		// GET-request successfull?
 		if ( $this->client->GetHttpResultCode() != '207' )
 		{
@@ -368,7 +361,43 @@ class SimpleCalDAVClient {
 	
 		// Reformat
 		$report = array();
-		foreach($results as $event) $report[] = new CalDAVObject($event['href'], $event['data'], $event['etag']);
+		foreach($results as $event) $report[] = new CalDAVObject($this->url.$event['href'], $event['data'], $event['etag']);
+	
+		return $report;
+	}
+	
+	/**
+	 * function getEntriesByUID()
+	 * Gets a all Events and TODOs from the CalDAV-Server which UIDs contain the given string.
+	 *
+	 * Arguments:
+	 * @param $search The string to search for
+	 *
+	 * Return value:
+	 * @return an array of CalDAVObjects (See CalDAVObject.php), representing the found Events and TODOs.
+	 *
+	 * Debugging:
+	 * @throws CalDAVException
+	 * For debugging purposes, just sorround everything with try { ... } catch (Exception $e) { echo $e->__toString(); exit(-1); }
+	 */
+	function getEntriesByUID ( $search )
+	{
+		// Connection and calendar set?
+		if(!isset($this->client)) throw new Exception('No connection. Try connect().');
+		if(!isset($this->client->calendar_url)) throw new Exception('No calendar selected. Try findCalendars() and setCalendar().');
+	
+		// Get it!
+		$results = $this->client->GetEntryByUid($search);
+		
+		// GET-request successfull?
+		if ( $this->client->GetHttpResultCode() != '207' ) // TODO: Additional ERROR-Codes for Filters?
+		{
+			throw new CalDAVException('Recieved unknown HTTP status', $this->client);
+		}
+	
+		// Reformat
+		$report = array();
+		foreach($results as $event) $report[] = new CalDAVObject($this->url.$event['href'], $event['data'], $event['etag']);
 	
 		return $report;
 	}
@@ -409,7 +438,7 @@ class SimpleCalDAVClient {
 	
 		// Reformat
 		$report = array();
-		foreach($results as $event) $report[] = new CalDAVObject($event['href'], $event['data'], $event['etag']);
+		foreach($results as $event) $report[] = new CalDAVObject($this->url.$event['href'], $event['data'], $event['etag']);
 	
 		return $report;
 	}
