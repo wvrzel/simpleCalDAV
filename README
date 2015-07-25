@@ -37,22 +37,12 @@ Actually, I hardly added any features. The main point of my work is to make ever
 
 Requirements of this library are
   - The php extension cURL ( http://www.php.net/manual/en/book.curl.php )
-  - From Andrew’s Web Libraries: ( https://github.com/andrews-web-libraries/awl )
-     - XMLDocument.php
-     - XMLElement.php
-     - AWLUtilities.php
-     - Translation.php
 
 
 3. Installation
 
-Just download
-  - from Andrew’s Web Libraries:
-     - XMLDocument.php: https://github.com/andrews-web-libraries/awl/raw/master/inc/XMLDocument.php
-     - XMLElement.php: https://github.com/andrews-web-libraries/awl/raw/master/inc/XMLElement.php
-     - AWLUtilities.php: https://raw.githubusercontent.com/andrews-web-libraries/awl/master/inc/AWLUtilities.php
-     - Translation.php: https://raw.githubusercontent.com/andrews-web-libraries/awl/master/inc/Translation.php
-and move them in the same directory as SimpleCalDAVClient.php
+Just navigate into a directory on your server and execute
+git clone https://github.com/wvrzel/simpleCalDAV.git
 
 Assure yourself that cURL is installed.
 

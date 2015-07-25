@@ -36,7 +36,7 @@
  *      - XMLDocument.php
  *      - XMLElement.php
  *      - AWLUtilities.php
- * 
+ *
  * @package simpleCalDAV
  */
 
@@ -50,7 +50,7 @@ require_once('CalDAVObject.php');
 class SimpleCalDAVClient {
 	private $client;
     private $url;
-	
+
 	/**
 	 * function connect()
 	 * Connects to a CalDAV-Server.
@@ -66,48 +66,48 @@ class SimpleCalDAVClient {
 	 */
 	function connect ( $url, $user, $pass )
 	{
-	
+
 		//  Connect to CalDAV-Server and log in
 		$client = new CalDAVClient($url, $user, $pass);
-	
+
 		// Valid CalDAV-Server? Or is it just a WebDAV-Server?
 		if( ! $client->isValidCalDAVServer() )
 		{
-			
+
 			if( $client->GetHttpResultCode() == '401' ) // unauthorisized
 			{
 					throw new CalDAVException('Login failed', $client);
 			}
-			
+
 			elseif( $client->GetHttpResultCode() == '' ) // can't reach server
 			{
 					throw new CalDAVException('Can\'t reach server', $client);
 			}
-			
+
 			else throw new CalDAVException('Could\'n find a CalDAV-collection under the url', $client);
 		}
-		
+
 		// Check for errors
 		if( $client->GetHttpResultCode() != '200' ) {
 			if( $client->GetHttpResultCode() == '401' ) // unauthorisized
 			{
 				throw new CalDAVException('Login failed', $client);
 			}
-		
+
 			elseif( $client->GetHttpResultCode() == '' ) // can't reach server
 			{
 				throw new CalDAVException('Can\'t reach server', $client);
 			}
-		
+
 			else // Unknown status
 			{
 				throw new CalDAVException('Recieved unknown HTTP status while checking the connection after establishing it', $client);
 			}
 		}
-	
+
 		$this->client = $client;
 	}
-	
+
 	/**
 	 * function findCalendars()
 	 * 
