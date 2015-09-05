@@ -29,7 +29,7 @@ It contains the following functions:
 
 All of those functions are really easy to use, self-explanatory and are deliverd with a big innitial comment, which explains all needed arguments and the return values.
 
-This library is heavily based on AgenDAV caldav-client-v2.php by Jorge López Pérez <jorge@adobo.org> which again is heavily based on DAViCal caldav-client-v2.php by Andrew McMillan <andrew@mcmillan.net.nz>.
+This library is heavily based on AgenDAV caldav-client-v2.php by Jorge LÃ³pez PÃ©rez <jorge@adobo.org> which again is heavily based on DAViCal caldav-client-v2.php by Andrew McMillan <andrew@mcmillan.net.nz>.
 Actually, I hardly added any features. The main point of my work is to make everything straight forward and easy to use. You can use simpleCalDAV whithout a deeper understanding of the calDAV-protocol.
 
 
@@ -37,20 +37,22 @@ Actually, I hardly added any features. The main point of my work is to make ever
 
 Requirements of this library are
   - The php extension cURL ( http://www.php.net/manual/en/book.curl.php )
-  - From Andrew’s Web Libraries: ( https://github.com/andrews-web-libraries/awl )
+  - From Andrewâ€™s Web Libraries: ( https://github.com/andrews-web-libraries/awl )
      - XMLDocument.php
      - XMLElement.php
      - AWLUtilities.php
+     - Translation.php
 
 
 3. Installation
 
 Just download
-  - from Andrew’s Web Libraries:
+  - from Andrewâ€™s Web Libraries:
      - XMLDocument.php: https://github.com/andrews-web-libraries/awl/raw/master/inc/XMLDocument.php
      - XMLElement.php: https://github.com/andrews-web-libraries/awl/raw/master/inc/XMLElement.php
      - AWLUtilities.php: https://raw.githubusercontent.com/andrews-web-libraries/awl/master/inc/AWLUtilities.php
-and move them in the same directory as simpleCalDAV.php
+     - Translation.php: https://raw.githubusercontent.com/andrews-web-libraries/awl/master/inc/Translation.php
+and move them in the same directory as SimpleCalDAVClient.php
 
 Assure yourself that cURL is installed.
 
