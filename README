@@ -46,12 +46,13 @@ git clone https://github.com/wvrzel/simpleCalDAV.git
 
 Assure yourself that cURL is installed.
 
-Import simpleCalDAV.php in your code and you are ready to go ;-)
+Import SimpleCalDAVClient.php in your code and you are ready to go ;-)
 
 
 4. How to get started
 
-Read the comments in simpleCalDAV.php and the example code.
+Read the comments in SimpleCalDAVClient.php and the example code.
+
 
 5. Example Code
 
