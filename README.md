@@ -12,15 +12,16 @@ simpleCalDAV
 Copyright 2014 Michael Palm <palm.michael@gmx.de>
 
 Table of content
+
 1. About
-2. Requirements
-3. Installation
-4. How to get started
-5. Example Code
+1. Requirements
+1. Installation
+1. How to get started
+1. Example Code
 
 ------------------------
 
-1. About
+1) About
 
 simpleCalDAV is a php library that allows you to connect to a calDAV-server to get event-, todo- and free/busy-calendar resources from the server, to change them, to delete them, to create new ones, etc.
 simpleCalDAV was made and tested for connections to the CalDAV-server Baikal 0.2.7. But it should work with any other CalDAV-server too.
@@ -42,13 +43,13 @@ This library is heavily based on AgenDAV simple-caldav-client-v2.php by Jorge LÃ
 Actually, I hardly added any features. The main point of my work is to make everything straight forward and easy to use. You can use simpleCalDAV whithout a deeper understanding of the calDAV-protocol.
 
 
-2. Requirements
+2) Requirements
 
 Requirements of this library are
   - The php extension cURL ( http://www.php.net/manual/en/book.curl.php )
 
 
-3. Installation
+3) Installation
 
 Just navigate into a directory on your server and execute
 git clone https://github.com/wvrzel/simpleCalDAV.git
@@ -58,11 +59,11 @@ Assure yourself that cURL is installed.
 Import SimpleCalDAVClient.php in your code and you are ready to go ;-)
 
 
-4. How to get started
+4) How to get started
 
 Read the comments in SimpleCalDAVClient.php and the example code.
 
 
-5. Example Code
+5) Example Code
 
 Example code is provided under "/example code/".
