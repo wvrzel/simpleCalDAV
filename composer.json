@@ -1,0 +1,25 @@
+{
+  "name": "thecsea/simple-caldav-client",
+  "type": "library",
+  "keywords": ["caldav","client", "simple"],
+  "description": "A simple and complete php caldav client",
+  "homepage": "http://www.thecsea.it",
+  "minimum-stability": "stable",
+  "license": "GPL-2.0",
+  "authors": [
+    {
+      "name": "claudio cardinale",
+      "email": "cardi@thecsea.it",
+      "homepage": "http://thecsea.it"
+    }
+  ],
+  "require": {
+    "php": ">=5.3.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "it\\thecsea\\simple_caldav_client\\": "src/"
+    }
+  }
+
+}

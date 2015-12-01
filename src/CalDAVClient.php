@@ -10,8 +10,10 @@
  * @package simpleCalDAV
  */
 
-require_once('CalDAVCalendar.php');
-require_once('include/XMLDocument.php');
+namespace it\thecsea\simple_caldav_client;
+
+use it\thecsea\simple_caldav_client\includes\XMLDocument;
+
 
 
 

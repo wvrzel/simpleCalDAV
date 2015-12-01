@@ -1,6 +1,8 @@
 <?php
 
-require_once('../SimpleCalDAVClient.php');
+require_once('../vendor/autoload.php');
+
+use it\thecsea\simple_caldav_client\SimpleCalDAVClient;
 
 $firstNewEvent = 'BEGIN:VCALENDAR
 PRODID:-//SomeExampleStuff//EN

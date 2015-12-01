@@ -1,3 +1,12 @@
+# simpleCalDAV
+
+Build status: [![Latest Stable Version](https://poser.pugx.org/thecsea/simple-caldav-client/v/stable)](https://packagist.org/packages/thecsea/simple-caldav-client) [![Total Downloads](https://poser.pugx.org/thecsea/simple-caldav-client/downloads)](https://packagist.org/packages/thecsea/simple-caldav-client) [![Latest Unstable Version](https://poser.pugx.org/thecsea/simple-caldav-client/v/unstable)](https://packagist.org/packages/thecsea/simple-caldav-client) [![License](https://poser.pugx.org/thecsea/simple-caldav-client/license)](https://packagist.org/packages/thecsea/simple-caldav-client)
+
+This library is just a porting for packagist of [https://github.com/wvrzel/simpleCalDAV](https://github.com/wvrzel/simpleCalDAV)
+
+# Examples of use
+* [https://github.com/dsd-meetme/backend](https://github.com/dsd-meetme/backend)
+
 simpleCalDAV
 
 Copyright 2014 Michael Palm <palm.michael@gmx.de>
@@ -29,7 +38,7 @@ It contains the following functions:
 
 All of those functions are really easy to use, self-explanatory and are deliverd with a big innitial comment, which explains all needed arguments and the return values.
 
-This library is heavily based on AgenDAV caldav-client-v2.php by Jorge López Pérez <jorge@adobo.org> which again is heavily based on DAViCal caldav-client-v2.php by Andrew McMillan <andrew@mcmillan.net.nz>.
+This library is heavily based on AgenDAV simple-caldav-client-v2.php by Jorge López Pérez <jorge@adobo.org> which again is heavily based on DAViCal caldav-client-v2.php by Andrew McMillan <andrew@mcmillan.net.nz>.
 Actually, I hardly added any features. The main point of my work is to make everything straight forward and easy to use. You can use simpleCalDAV whithout a deeper understanding of the calDAV-protocol.
 
 

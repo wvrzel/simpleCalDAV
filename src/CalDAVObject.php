@@ -21,6 +21,8 @@
  *
  */
 
+namespace it\thecsea\simple_caldav_client;
+
 class CalDAVObject {
 	private $href;
 	private $data;

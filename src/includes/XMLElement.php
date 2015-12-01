@@ -9,7 +9,9 @@
 * @license   http://www.gnu.org/licenses/lgpl-3.0.txt  GNU LGPL version 3 or later
 */
 
-require_once('AWLUtilities.php');
+namespace it\thecsea\simple_caldav_client\includes;
+
+require_once(__DIR__.'/AWLUtilities.php');
 
 /**
 * A class for XML elements which may have attributes, or contain
