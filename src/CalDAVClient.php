@@ -13,6 +13,7 @@
 namespace it\thecsea\simple_caldav_client;
 
 use it\thecsea\simple_caldav_client\includes\XMLDocument;
+use it\thecsea\simple_caldav_client\includes\XMLElement;
 
 
 
