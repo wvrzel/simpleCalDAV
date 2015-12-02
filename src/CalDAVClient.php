@@ -62,6 +62,7 @@ class CalDAVClient {
   protected $xmlResponse = "";  // xml received
   protected $httpResultCode = "";
     private $httpResponseHeaders = '';
+    private $httpResponseBody = '';
 
   protected $parser; // our XML parser object
 
