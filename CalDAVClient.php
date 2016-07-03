@@ -991,11 +991,11 @@ EOFILTER;
   	$this->SetDepth('1');
   	
   	if ( isset($start) && isset($finish) )
-  		$range = "<C:comp-filter name=\"VALARM\"><C:time-range start=\"$start\" end=\"$finish\"/></C:comp-filter>";
+  		$range = "<C:comp-filter name=\"CREATED\"><C:time-range start=\"$start\" end=\"$finish\"/></C:comp-filter>";
   	elseif ( isset($start) && ! isset($finish) )
-  		$range = "<C:comp-filter name=\"VALARM\"><C:time-range start=\"$start\"/></C:comp-filter>";
+  		$range = "<C:comp-filter name=\"CREATED\"><C:time-range start=\"$start\"/></C:comp-filter>";
   	elseif ( ! isset($start) && isset($finish) )
-  		$range = "<C:comp-filter name=\"VALARM\"><C:time-range end=\"$finish\"/></C:comp-filter>";
+  		$range = "<C:comp-filter name=\"CREATED\"><C:time-range end=\"$finish\"/></C:comp-filter>";
   	else
   		$range = '';
 
