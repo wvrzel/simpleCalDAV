@@ -193,7 +193,7 @@ class SimpleCalDAVClient
         }
 
         // Put it!
-        $newEtag = $this->client->DoPUTRequest($this->url . $uid . '.ics', $cal);
+        $newEtag = $this->client->DoPUTRequest($this->url . $uid . '.ics', $cal, '*');
 
         // PUT-request successfull?
         if ($this->client->GetHttpResultCode() != '201') {
