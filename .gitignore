@@ -218,3 +218,17 @@ pip-log.txt
 /Translation.php
 /XMLDocument.php
 /XMLElement.php
+
+.idea/copyright/profiles_settings.xml
+
+.idea/encodings.xml
+
+.idea/misc.xml
+
+.idea/modules.xml
+
+.idea/simpleCalDAV.iml
+
+.idea/vcs.xml
+
+.idea/workspace.xml
