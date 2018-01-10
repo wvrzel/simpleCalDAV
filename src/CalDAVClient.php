@@ -733,12 +733,14 @@ class CalDAVClient {
       }
 
       $calendar_home = array();
-      foreach( $this->xmltags['urn:ietf:params:xml:ns:caldav:calendar-home-set'] AS $k => $v ) {
-          if ( $this->xmlnodes[$v]['type'] != 'open' ) continue;
-          while( $this->xmlnodes[++$v]['type'] != 'close' && $this->xmlnodes[$v]['tag'] != 'urn:ietf:params:xml:ns:caldav:calendar-home-set' ) {
-              //        printf( "Tag: '%s' = '%s'\n", $this->xmlnodes[$v]['tag'], $this->xmlnodes[$v]['value']);
-              if ( $this->xmlnodes[$v]['tag'] == 'DAV::href' && isset($this->xmlnodes[$v]['value']) )
-                  $calendar_home[] = rawurldecode($this->xmlnodes[$v]['value']);
+      if (isset($this->xamltags['urn:ietf:params:xml:ns:caldav:calendar-home-set'])) {
+          foreach( $this->xmltags['urn:ietf:params:xml:ns:caldav:calendar-home-set'] AS $k => $v ) {
+              if ( $this->xmlnodes[$v]['type'] != 'open' ) continue;
+              while( $this->xmlnodes[++$v]['type'] != 'close' && $this->xmlnodes[$v]['tag'] != 'urn:ietf:params:xml:ns:caldav:calendar-home-set' ) {
+                  //        printf( "Tag: '%s' = '%s'\n", $this->xmlnodes[$v]['tag'], $this->xmlnodes[$v]['value']);
+                  if ( $this->xmlnodes[$v]['tag'] == 'DAV::href' && isset($this->xmlnodes[$v]['value']) )
+                      $calendar_home[] = rawurldecode($this->xmlnodes[$v]['value']);
+              }
           }
       }
 
