@@ -602,6 +602,10 @@ class CalDAVClient {
    * @param string $tagname The tag name to find the href inside of
    */
   function HrefValueInside( $tagname ) {
+      if (!isset($this->xmltags[$tagname])) {
+      	  return null;
+      }
+	  
       foreach( $this->xmltags[$tagname] AS $k => $v ) {
           $j = $v + 1;
           if ( $this->xmlnodes[$j]['tag'] == 'DAV::href' ) {
