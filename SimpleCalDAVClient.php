@@ -48,6 +48,8 @@ require_once('CalDAVFilter.php');
 require_once('CalDAVObject.php');
 
 class SimpleCalDAVClient {
+
+	/** @var CalDAVClient $client */
 	private $client;
     private $url;
 
@@ -56,15 +58,15 @@ class SimpleCalDAVClient {
 	 * Connects to a CalDAV-Server.
 	 *
 	 * Arguments:
-	 * @param $url URL to the CalDAV-server. E.g. http://exam.pl/baikal/cal.php/username/calendername/
-	 * @param $user Username to login with
-	 * @param $pass Password to login with
+	 * @param string $url URL to the CalDAV-server. E.g. http://exam.pl/baikal/cal.php/username/calendername/
+	 * @param string $user Username to login with
+	 * @param string $pass Password to login with
 	 *
 	 * Debugging:
 	 * @throws CalDAVException
-	 * For debugging purposes, just sorround everything with try { ... } catch (Exception $e) { echo $e->__toString(); }
+	 * For debugging purposes, just surround everything with try { ... } catch (Exception $e) { echo $e->__toString(); }
 	 */
-	function connect ( $url, $user, $pass )
+	public function connect ( $url, $user, $pass )
 	{
 
 		//  Connect to CalDAV-Server and log in
@@ -101,7 +103,7 @@ class SimpleCalDAVClient {
 
 			else // Unknown status
 			{
-				throw new CalDAVException('Recieved unknown HTTP status while checking the connection after establishing it', $client);
+				throw new CalDAVException('Received unknown HTTP status while checking the connection after establishing it', $client);
 			}
 		}
 
@@ -114,13 +116,13 @@ class SimpleCalDAVClient {
 	 * Requests a list of all accessible calendars on the server
 	 *
 	 * Return value:
-	 * @return an array of CalDAVCalendar-Objects (see CalDAVCalendar.php), representing all calendars accessible by the current principal (user).
+	 * @return CalDAVCalendar[] an array of CalDAVCalendar-Objects (see CalDAVCalendar.php), representing all calendars accessible by the current principal (user).
 	 *
 	 * Debugging:
-	 * @throws CalDAVException
-	 * For debugging purposes, just sorround everything with try { ... } catch (Exception $e) { echo $e->__toString(); exit(-1); }
+	 * @throws Exception
+	 * For debugging purposes, just surround everything with try { ... } catch (Exception $e) { echo $e->__toString(); exit(-1); }
 	 */
-	function findCalendars()
+    public function findCalendars()
 	{
 		if(!isset($this->client)) throw new Exception('No connection. Try connect().');
 		
@@ -130,13 +132,16 @@ class SimpleCalDAVClient {
 	/**
 	 * function setCalendar()
 	 *
-	 * Sets the actual calendar to work with
+	 * Sets the current calendar to work with
+	 *
+	 * Arguments:
+	 * @param CalDAVCalendar $calendar Calendar to be set as current calendar.
 	 *
 	 * Debugging:
-	 * @throws CalDAVException
-	 * For debugging purposes, just sorround everything with try { ... } catch (Exception $e) { echo $e->__toString(); exit(-1); }
+	 * @throws Exception
+	 * For debugging purposes, just surround everything with try { ... } catch (Exception $e) { echo $e->__toString(); exit(-1); }
 	 */
-	function setCalendar ( CalDAVCalendar $calendar )
+    public function setCalendar ( CalDAVCalendar $calendar )
 	{
 		if(!isset($this->client)) throw new Exception('No connection. Try connect().');
 		
@@ -156,13 +161,14 @@ class SimpleCalDAVClient {
 	 *           	Notice: The iCalendar-data contains the unique ID which specifies where the event is being saved.
 	 *
 	 * Return value:
-	 * @return An CalDAVObject-representation (see CalDAVObject.php) of your created resource
+	 * @return CalDAVObject An CalDAVObject-representation (see CalDAVObject.php) of your created resource
 	 *
 	 * Debugging:
+     * @throws Exception
 	 * @throws CalDAVException
-	 * For debugging purposes, just sorround everything with try { ... } catch (Exception $e) { echo $e->__toString(); exit(-1); }
+	 * For debugging purposes, just surround everything with try { ... } catch (Exception $e) { echo $e->__toString(); exit(-1); }
 	 */
-	function create ( $cal )
+    public function create ( $cal )
 	{
 		// Connection and calendar set?
 		if(!isset($this->client)) throw new Exception('No connection. Try connect().');
@@ -176,12 +182,12 @@ class SimpleCalDAVClient {
 		$result = $this->client->GetEntryByHref( $this->url.$uid.'.ics' );
 		if ( $this->client->GetHttpResultCode() == '200' ) { throw new CalDAVException($this->url.$uid.'.ics already exists. UID not unique?', $this->client); }
 		else if ( $this->client->GetHttpResultCode() == '404' );
-		else throw new CalDAVException('Recieved unknown HTTP status', $this->client);
+		else throw new CalDAVException('Received unknown HTTP status', $this->client);
 		
 		// Put it!
 		$newEtag = $this->client->DoPUTRequest( $this->url.$uid.'.ics', $cal );
-	
-		// PUT-request successfull?
+
+		// PUT-request successful?
 		if ( $this->client->GetHttpResultCode() != '201' )
 		{
 			if ( $this->client->GetHttpResultCode() == '204' ) // $url.$uid.'.ics' already existed on server
@@ -191,7 +197,7 @@ class SimpleCalDAVClient {
 	
 			else // Unknown status
 			{
-				throw new CalDAVException('Recieved unknown HTTP status', $this->client);
+				throw new CalDAVException('Received unknown HTTP status', $this->client);
 			}
 		}
 	
@@ -203,18 +209,19 @@ class SimpleCalDAVClient {
 	 * Changes a calendar resource (event, todo, etc.) on the CalDAV-Server.
 	 *
 	 * Arguments:
-	 * @param $href See CalDAVObject.php
-	 * @param $cal The new iCalendar-data that should be used to overwrite the old one.
-	 * @param $etag See CalDAVObject.php
+	 * @param string $href See CalDAVObject.php
+	 * @param string $new_data The new iCalendar-data that should be used to overwrite the old one.
+	 * @param string $etag See CalDAVObject.php
 	 *
 	 * Return value:
-	 * @return An CalDAVObject-representation (see CalDAVObject.php) of your changed resource
+	 * @return CalDAVObject An CalDAVObject-representation (see CalDAVObject.php) of your changed resource
 	 *
 	 * Debugging:
+	 * @throws Exception
 	 * @throws CalDAVException
-	 * For debugging purposes, just sorround everything with try { ... } catch (Exception $e) { echo $e->__toString(); exit(-1); }
+	 * For debugging purposes, just surround everything with try { ... } catch (Exception $e) { echo $e->__toString(); exit(-1); }
 	 */
-	function change ( $href, $new_data, $etag )
+    public function change ( $href, $new_data, $etag )
 	{
 		// Connection and calendar set?
 		if(!isset($this->client)) throw new Exception('No connection. Try connect().');
@@ -222,9 +229,9 @@ class SimpleCalDAVClient {
 	
 		// Does $href exist?
 		$result = $this->client->GetEntryByHref($href);
-		if ( $this->client->GetHttpResultCode() == '200' ); 
+		if ( $this->client->GetHttpResultCode() == '200' );
 		else if ( $this->client->GetHttpResultCode() == '404' ) throw new CalDAVException('Can\'t find '.$href.' on the server', $this->client);
-		else throw new CalDAVException('Recieved unknown HTTP status', $this->client);
+		else throw new CalDAVException('Received unknown HTTP status', $this->client);
 		
 		// $etag correct?
 		if($result[0]['etag'] != $etag) { throw new CalDAVException('Wrong entity tag. The entity seems to have changed.', $this->client); }
@@ -232,10 +239,10 @@ class SimpleCalDAVClient {
 		// Put it!
 		$newEtag = $this->client->DoPUTRequest( $href, $new_data, $etag );
 		
-		// PUT-request successfull?
+		// PUT-request successful?
 		if ( $this->client->GetHttpResultCode() != '204' && $this->client->GetHttpResultCode() != '200' )
 		{
-			throw new CalDAVException('Recieved unknown HTTP status', $this->client);
+			throw new CalDAVException('Received unknown HTTP status', $this->client);
 		}
 		
 		return new CalDAVObject($href, $new_data, $newEtag);
@@ -243,17 +250,18 @@ class SimpleCalDAVClient {
 	
 	/**
 	 * function delete()
-	 * Delets an event or a TODO from the CalDAV-Server.
+	 * Deletes an event or a TODO from the CalDAV-Server.
 	 *
 	 * Arguments:
-	 * @param $href See CalDAVObject.php
-	 * @param $etag See CalDAVObject.php
+	 * @param string $href See CalDAVObject.php
+	 * @param string $etag See CalDAVObject.php
 	 *
 	 * Debugging:
+	 * @throws Exception
 	 * @throws CalDAVException
-	 * For debugging purposes, just sorround everything with try { ... } catch (Exception $e) { echo $e->__toString(); exit(-1); }
+	 * For debugging purposes, just surround everything with try { ... } catch (Exception $e) { echo $e->__toString(); exit(-1); }
 	 */
-	function delete ( $href, $etag )
+    public function delete ( $href, $etag )
 	{
 		// Connection and calendar set?
 		if(!isset($this->client)) throw new Exception('No connection. Try connect().');
@@ -269,10 +277,10 @@ class SimpleCalDAVClient {
 		// Do the deletion
 		$this->client->DoDELETERequest($href, $etag);
 	
-		// Deletion successfull?
+		// Deletion successful?
 		if ( $this->client->GetHttpResultCode() != '200' and $this->client->GetHttpResultCode() != '204' )
 		{
-			throw new CalDAVException('Recieved unknown HTTP status', $this->client);
+			throw new CalDAVException('Received unknown HTTP status', $this->client);
 		}
 	}
 	
@@ -281,36 +289,37 @@ class SimpleCalDAVClient {
 	 * Gets a all events from the CalDAV-Server which lie in a defined time interval.
 	 *
 	 * Arguments:
-	 * @param $start The starting point of the time interval. Must be in the format yyyymmddThhmmssZ and should be in
-	 *           		GMT. If omitted the value is set to -infinity.
-	 * @param $end The end point of the time interval. Must be in the format yyyymmddThhmmssZ and should be in
-	 *           		GMT. If omitted the value is set to +infinity.
+	 * @param DateTime|string|null $start The starting point of the time interval. Must be in the format yyyymmddThhmmssZ and should be in
+	 *                                    GMT. If omitted the value is set to -infinity.
+	 * @param DateTime|string|null $end The end point of the time interval. Must be in the format yyyymmddThhmmssZ and should be in
+	 *                                  GMT. If omitted the value is set to +infinity.
 	 *
 	 * Return value:
-	 * @return an array of CalDAVObjects (See CalDAVObject.php), representing the found events.
+	 * @return \CalDAVObject[] an array of CalDAVObjects (See CalDAVObject.php), representing the found events.
 	 *
 	 * Debugging:
+	 * @throws Exception
 	 * @throws CalDAVException
-	 * For debugging purposes, just sorround everything with try { ... } catch (Exception $e) { echo $e->__toString(); exit(-1); }
+	 * For debugging purposes, just surround everything with try { ... } catch (Exception $e) { echo $e->__toString(); exit(-1); }
 	 */
-	function getEvents ( $start = null, $end = null )
+    public function getEvents ( $start = null, $end = null )
 	{
 		// Connection and calendar set?
 		if(!isset($this->client)) throw new Exception('No connection. Try connect().');
 		if(!isset($this->client->calendar_url)) throw new Exception('No calendar selected. Try findCalendars() and setCalendar().');
 		
 		// Are $start and $end in the correct format?
-		if ( ( isset($start) and ! preg_match( '#^\d\d\d\d\d\d\d\dT\d\d\d\d\d\dZ$#', $start, $matches ) )
-		  or ( isset($end) and ! preg_match( '#^\d\d\d\d\d\d\d\dT\d\d\d\d\d\dZ$#', $end, $matches ) ) )
-		{ trigger_error('$start or $end are in the wrong format. They must have the format yyyymmddThhmmssZ and should be in GMT', E_USER_ERROR); }
+		$start = $this->convertToGmtString($start);
+		$end   = $this->convertToGmtString($end);
+
 	
 		// Get it!
 		$results = $this->client->GetEvents( $start, $end );
 	
-		// GET-request successfull?
+		// GET-request successful?
 		if ( $this->client->GetHttpResultCode() != '207' )
 		{
-			throw new CalDAVException('Recieved unknown HTTP status', $this->client);
+			throw new CalDAVException('Received unknown HTTP status', $this->client);
 		}
 		
 		// Reformat
@@ -326,38 +335,38 @@ class SimpleCalDAVClient {
 	 * given criteria.
 	 *
 	 * Arguments:
-	 * @param $start The starting point of the time interval. Must be in the format yyyymmddThhmmssZ and should be in
-	 *              	GMT. If omitted the value is set to -infinity.
-	 * @param $end The end point of the time interval. Must be in the format yyyymmddThhmmssZ and should be in
-	 *              	GMT. If omitted the value is set to +infinity.
-	 * @param $complete Filter for completed tasks (true) or for uncompleted tasks (false). If omitted, the function will return both.
-	 * @param $cancelled Filter for cancelled tasks (true) or for uncancelled tasks (false). If omitted, the function will return both.
+	 * @param DateTime|string|null $start The starting point of the time interval. Must be in the format yyyymmddThhmmssZ and should be in
+	 *                                    GMT. If omitted the value is set to -infinity.
+	 * @param DateTime|string|null $end The end point of the time interval. Must be in the format yyyymmddThhmmssZ and should be in
+	 *                                  GMT. If omitted the value is set to +infinity.
+	 * @param bool $completed Filter for completed tasks (true) or for uncompleted tasks (false). If omitted, the function will return both.
+	 * @param bool $cancelled Filter for cancelled tasks (true) or for uncancelled tasks (false). If omitted, the function will return both.
 	 *
 	 * Return value:
-	 * @return an array of CalDAVObjects (See CalDAVObject.php), representing the found TODOs.
+	 * @return CalDAVObject[] an array of CalDAVObjects (See CalDAVObject.php), representing the found TODOs.
 	 *
 	 * Debugging:
+	 * @throws Exception
 	 * @throws CalDAVException
-	 * For debugging purposes, just sorround everything with try { ... } catch (Exception $e) { echo $e->__toString(); exit(-1); }
+	 * For debugging purposes, just surround everything with try { ... } catch (Exception $e) { echo $e->__toString(); exit(-1); }
 	 */
-	function getTODOs ( $start = null, $end = null, $completed = null, $cancelled = null )
+    public function getTODOs ( $start = null, $end = null, $completed = null, $cancelled = null )
 	{
 		// Connection and calendar set?
 		if(!isset($this->client)) throw new Exception('No connection. Try connect().');
 		if(!isset($this->client->calendar_url)) throw new Exception('No calendar selected. Try findCalendars() and setCalendar().');
 	
 		// Are $start and $end in the correct format?
-		if ( ( isset($start) and ! preg_match( '#^\d\d\d\d\d\d\d\dT\d\d\d\d\d\dZ$#', $start, $matches ) )
-		  or ( isset($end) and ! preg_match( '#^\d\d\d\d\d\d\d\dT\d\d\d\d\d\dZ$#', $end, $matches ) ) )
-		{ trigger_error('$start or $end are in the wrong format. They must have the format yyyymmddThhmmssZ and should be in GMT', E_USER_ERROR); }
-	
+        $start = $this->convertToGmtString($start);
+        $end   = $this->convertToGmtString($end);
+
 		// Get it!
 		$results = $this->client->GetTodos( $start, $end, $completed, $cancelled );
 		
-		// GET-request successfull?
+		// GET-request successful?
 		if ( $this->client->GetHttpResultCode() != '207' )
 		{
-			throw new CalDAVException('Recieved unknown HTTP status', $this->client);
+			throw new CalDAVException('Received unknown HTTP status', $this->client);
 		}
 	
 		// Reformat
@@ -377,16 +386,17 @@ class SimpleCalDAVClient {
 	 * See http://www.rfcreader.com/#rfc4791_line1524 for more information about how to write filters on your own.
 	 * 
 	 * Arguments:
-	 * @param $filterXML The stuff, you want to send encapsulated in the <C:filter>-tag.
+	 * @param string $filterXML The stuff, you want to send encapsulated in the <C:filter>-tag.
 	 * 
 	 * Return value:
-	 * @return an array of CalDAVObjects (See CalDAVObject.php), representing the found calendar resources.
+	 * @return CalDAVObject[] an array of CalDAVObjects (See CalDAVObject.php), representing the found calendar resources.
 	 * 
 	 * Debugging:
+	 * @throws Exception
 	 * @throws CalDAVException
-	 * For debugging purposes, just sorround everything with try { ... } catch (Exception $e) { echo $e->__toString(); exit(-1); }
+	 * For debugging purposes, just surround everything with try { ... } catch (Exception $e) { echo $e->__toString(); exit(-1); }
 	 */
-	function getCustomReport ( $filterXML )
+    public function getCustomReport ( $filterXML )
 	{
 		// Connection and calendar set?
 		if(!isset($this->client)) throw new Exception('No connection. Try connect().');
@@ -398,10 +408,10 @@ class SimpleCalDAVClient {
 		// Get it!
 		$results = $this->client->DoCalendarQuery('<C:filter>'.$filterXML.'</C:filter>');
 		
-		// GET-request successfull?
+		// GET-request successful?
 		if ( $this->client->GetHttpResultCode() != '207' )
 		{
-			throw new CalDAVException('Recieved unknown HTTP status', $this->client);
+			throw new CalDAVException('Received unknown HTTP status', $this->client);
 		}
 	
 		// Reformat
@@ -409,6 +419,32 @@ class SimpleCalDAVClient {
 		foreach($results as $event) $report[] = new CalDAVObject($this->url.$event['href'], $event['data'], $event['etag']);
 	
 		return $report;
+	}
+
+
+    /**
+	 * Converts the given time to a string in the following format: yyyymmddThhmmssZ where T and Z
+	 * are the letters themselves.
+     * @param DateTime|string|null $time Time to be converted. When given as null it will be
+	 * directly returned as null. When given as string in a wrong format an error will get
+	 * triggered.
+     * @return null|string
+     */
+	protected function convertToGmtString($time)
+	{
+		if (!isset($time)) return null;
+
+        // Convert $time from DateTime object to string in GMT/UTC time.
+        if ($time instanceof DateTime)
+        {
+            $time->setTimezone(new DateTimeZone('GMT'));
+            $time = $time->format('Ymd\THis\Z');
+        }
+        // Check format
+        elseif ( ! preg_match( '/^\d{8}T\d{6}Z$/', $time ) )
+        	trigger_error('$start or $end are in the wrong format. They must have the format yyyymmddThhmmssZ and should be in GMT', E_USER_ERROR);
+
+		return $time;
 	}
 }
 
