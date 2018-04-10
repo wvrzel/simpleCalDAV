@@ -147,9 +147,8 @@ class SimpleCalDAVClient {
 		
 		$this->client->SetCalendar($this->client->first_url_part.$calendar->getURL());
         
-        // Is there a '/' at the end of the calendar_url?
-		if ( ! preg_match( '#^.*?/$#', $this->client->calendar_url, $matches ) ) { $this->url = $this->client->calendar_url.'/'; }
-		else { $this->url = $this->client->calendar_url; }
+        // Add trailing slash to url if not already existing.
+        $this->url = preg_replace('#(?<!/)$#', '/', $this->client->calendar_url);
 	}
 	
 	/**
@@ -157,8 +156,8 @@ class SimpleCalDAVClient {
 	 * Creates a new calendar resource on the CalDAV-Server (event, todo, etc.).
 	 *
 	 * Arguments:
-	 * @param $cal iCalendar-data of the resource you want to create.
-	 *           	Notice: The iCalendar-data contains the unique ID which specifies where the event is being saved.
+	 * @param string $cal iCalendar-data of the resource you want to create.
+	 *           	      Notice: The iCalendar-data contains the unique ID which specifies where the event is being saved.
 	 *
 	 * Return value:
 	 * @return CalDAVObject An CalDAVObject-representation (see CalDAVObject.php) of your created resource
