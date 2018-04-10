@@ -148,6 +148,8 @@ class SimpleCalDAVClient {
 	 */
     public function setCalendar ( CalDAVCalendar $calendar )
 	{
+		if (!isset($calendar)) return;
+
 		$this->checkClient();
 		
         $this->calendar = $calendar;

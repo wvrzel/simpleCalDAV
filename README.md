@@ -43,7 +43,7 @@ This library is heavily based on AgenDAV caldav-client-v2.php by Jorge LÃ³pez PÃ
 which again is heavily based on DAViCal caldav-client-v2.php by Andrew McMillan
 <andrew@mcmillan.net.nz>.
 Actually, I hardly added any features. The main point of my work is to make everything straight
-forward and easy to use. You can use simpleCalDAV whithout a deeper understanding of the
+forward and easy to use. You can use simpleCalDAV without a deeper understanding of the
 calDAV-protocol.
 
 
