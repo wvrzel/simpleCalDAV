@@ -49,6 +49,8 @@ require_once('CalDAVObject.php');
 
 class SimpleCalDAVClient {
 
+    /** @var CalDAVCalendar|null $calendar The currently set calendar. */
+    private $calendar;
 	/** @var CalDAVClient $client */
 	private $client;
     private $url;
@@ -145,6 +147,7 @@ class SimpleCalDAVClient {
 	{
 		if(!isset($this->client)) throw new Exception('No connection. Try connect().');
 		
+        $this->calendar = $calendar;
 		$this->client->SetCalendar($this->client->first_url_part.$calendar->getURL());
         
         // Add trailing slash to url if not already existing.
@@ -200,7 +203,7 @@ class SimpleCalDAVClient {
 			}
 		}
 	
-		return new CalDAVObject($this->url.$uid.'.ics', $cal, $newEtag);
+		return new CalDAVObject($this->url.$uid.'.ics', $cal, $newEtag, $this->calendar);
 	}
 	
 	/**
@@ -244,7 +247,7 @@ class SimpleCalDAVClient {
 			throw new CalDAVException('Received unknown HTTP status', $this->client);
 		}
 		
-		return new CalDAVObject($href, $new_data, $newEtag);
+		return new CalDAVObject($href, $new_data, $newEtag, $this->calendar);
 	}
 	
 	/**
@@ -323,7 +326,7 @@ class SimpleCalDAVClient {
 		
 		// Reformat
 		$report = array();
-		foreach($results as $event) $report[] = new CalDAVObject($this->url.$event['href'], $event['data'], $event['etag']);
+		foreach($results as $event) $report[] = new CalDAVObject($this->url.$event['href'], $event['data'], $event['etag'], $this->calendar);
 	
 		return $report;
 	}
@@ -370,11 +373,20 @@ class SimpleCalDAVClient {
 	
 		// Reformat
 		$report = array();
-		foreach($results as $event) $report[] = new CalDAVObject($this->url.$event['href'], $event['data'], $event['etag']);
+		foreach($results as $event) $report[] = new CalDAVObject($this->url.$event['href'], $event['data'], $event['etag'], $this->calendar);
 	
 		return $report;
 	}
-	
+
+    /**
+	 * Returns the currently selected {@link CalDAVCalendar calendar} or null if none is selected.
+     * @return CalDAVCalendar|null
+     */
+	public function getCalendar()
+	{
+		return $this->calendar;
+	}
+
 	/**
 	 * function getCustomReport()
      * Sends a custom request to the server
@@ -415,7 +427,7 @@ class SimpleCalDAVClient {
 	
 		// Reformat
 		$report = array();
-		foreach($results as $event) $report[] = new CalDAVObject($this->url.$event['href'], $event['data'], $event['etag']);
+		foreach($results as $event) $report[] = new CalDAVObject($this->url.$event['href'], $event['data'], $event['etag'], $this->calendar);
 	
 		return $report;
 	}
