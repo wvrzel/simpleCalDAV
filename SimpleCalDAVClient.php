@@ -14,11 +14,14 @@
  *   - connect()
  *   - findCalendars()
  *   - setCalendar()
+ *   - getCalendar()
  *   - create()
  *   - change()
  *   - delete()
  *   - getEvents()
+ *   - getAllEvents()
  *   - getTODOs()
+ *   - getAllTODOs()
  *   - getCustomReport()
  *
  * All of those functions - except the last one - are realy easy to use, self-explanatory and are
@@ -285,7 +288,8 @@ class SimpleCalDAVClient {
 	
 	/**
 	 * function getEvents()
-	 * Gets a all events from the CalDAV-Server which lie in a defined time interval.
+	 * Gets all events from the current calendar on the CalDAV-Server which lie in a defined time
+	 * interval.
 	 *
 	 * Arguments:
 	 * @param DateTime|string|null $start The starting point of the time interval. Must be in the format yyyymmddThhmmssZ and should be in
@@ -310,7 +314,6 @@ class SimpleCalDAVClient {
 		$start = $this->convertToGmtString($start);
 		$end   = $this->convertToGmtString($end);
 
-	
 		// Get it!
 		$results = $this->client->GetEvents( $start, $end );
 	
@@ -326,19 +329,52 @@ class SimpleCalDAVClient {
 	
 		return $report;
 	}
+
+    /**
+     * Returns all the events from all available calendars passing its parameters directly to
+	 * {@link getEvents}.
+     *
+     * @param DateTime|string|null $start Interval start as either DateTime object or GMT string (yyyymmddThhmmssZ).
+     * @param DateTime|string|null $end Interval end as either DateTime object or GMT string (yyyymmddThhmmssZ).
+     *
+     * @return CalDAVObject[]
+     *
+     * @throws Exception
+     * @throws CalDAVException
+     */
+    public function getAllEvents($start = null, $end = null)
+    {
+    	// remember the current calendar
+		$current_calendar = $this->getCalendar();
+
+		// fetch all events
+		$events = array();
+		foreach ($this->findCalendars() as $calendar) {
+			$this->setCalendar($calendar);
+			$events[] = $this->getEvents($start, $end);
+		}
+
+		// flatten two dimensional array
+        $events = call_user_func_array('array_merge', $events);
+
+		// restore previously set calendar
+		$this->setCalendar($current_calendar);
+
+		return $events;
+    }
 	
 	/**
 	 * function getTODOs()
-	 * Gets a all TODOs from the CalDAV-Server which lie in a defined time interval and match the
-	 * given criteria.
+	 * Gets all TODOs from the current calendar on the CalDAV-Server which lie in a defined time
+	 * interval and match the given criteria.
 	 *
 	 * Arguments:
 	 * @param DateTime|string|null $start The starting point of the time interval. Must be in the format yyyymmddThhmmssZ and should be in
 	 *                                    GMT. If omitted the value is set to -infinity.
 	 * @param DateTime|string|null $end The end point of the time interval. Must be in the format yyyymmddThhmmssZ and should be in
 	 *                                  GMT. If omitted the value is set to +infinity.
-	 * @param bool $completed Filter for completed tasks (true) or for uncompleted tasks (false). If omitted, the function will return both.
-	 * @param bool $cancelled Filter for cancelled tasks (true) or for uncancelled tasks (false). If omitted, the function will return both.
+	 * @param bool|null $completed Filter for completed tasks (true) or for uncompleted tasks (false). If omitted, the function will return both.
+	 * @param bool|null $cancelled Filter for cancelled tasks (true) or for uncancelled tasks (false). If omitted, the function will return both.
 	 *
 	 * Return value:
 	 * @return CalDAVObject[] an array of CalDAVObjects (See CalDAVObject.php), representing the found TODOs.
@@ -372,6 +408,41 @@ class SimpleCalDAVClient {
 	
 		return $report;
 	}
+
+    /**
+     * Returns all the TODOs from all available calendars passing its parameters directly to
+     * {@link getTodos}.
+     *
+     * @param DateTime|string|null $start Interval start as either DateTime object or GMT string (yyyymmddThhmmssZ).
+     * @param DateTime|string|null $end Interval end as either DateTime object or GMT string (yyyymmddThhmmssZ).
+     * @param bool|null $completed Returns completed (true), uncompleted (false) or both (null).
+     * @param bool|null $cancelled Returns cancelled (true), uncancelled (false) or both (null).
+	 * 
+     * @return CalDAVObject[]
+	 * 
+     * @throws Exception
+     * @throws CalDAVException
+     */
+    public function getAllTODOs($start = null, $end = null, $completed = null, $cancelled = null)
+    {
+        // remember the current calendar
+        $current_calendar = $this->getCalendar();
+
+		// fetch all TODOs
+        $todos = array();
+        foreach ($this->findCalendars() as $calendar) {
+            $this->setCalendar($calendar);
+            $todos[] = $this->getTODOs($start, $end, $completed, $cancelled);
+        }
+
+        // flatten two dimensional array
+        $todos = call_user_func_array('array_merge', $todos);
+
+        // restore previously set calendar
+        $this->setCalendar($current_calendar);
+
+        return $todos;
+    }
 
     /**
 	 * Returns the currently selected {@link CalDAVCalendar calendar} or null if none is selected.
