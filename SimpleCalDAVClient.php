@@ -360,7 +360,8 @@ class SimpleCalDAVClient {
         $events = call_user_func_array('array_merge', $events);
 
 		// restore previously set calendar
-		$this->setCalendar($current_calendar);
+        if (isset($current_calendar))
+            $this->setCalendar($current_calendar);
 
 		return $events;
     }
@@ -441,7 +442,8 @@ class SimpleCalDAVClient {
         $todos = call_user_func_array('array_merge', $todos);
 
         // restore previously set calendar
-        $this->setCalendar($current_calendar);
+        if (isset($current_calendar))
+            $this->setCalendar($current_calendar);
 
         return $todos;
     }
