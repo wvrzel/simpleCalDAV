@@ -758,17 +758,14 @@ class CalDAVClient {
       if ( !isset($this->calendar_home_set[0]) ) {
           $this->FindCalendarHome($recursed);
       }
-      else {
-          $properties = 
-              array(
+      $properties = array(
                       'resourcetype',
                       'displayname',
                       'http://calendarserver.org/ns/:getctag',
                       'http://apple.com/ns/ical/:calendar-color',
                       'http://apple.com/ns/ical/:calendar-order',
                    );
-          $this->DoPROPFINDRequest( $this->first_url_part.$this->calendar_home_set[0], $properties, 1);
-      }
+      @$this->DoPROPFINDRequest( $this->first_url_part.$this->calendar_home_set[0], $properties, 1);
       
       return $this->parse_calendar_info();
   }
