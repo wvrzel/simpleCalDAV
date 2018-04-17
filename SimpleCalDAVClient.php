@@ -357,7 +357,8 @@ class SimpleCalDAVClient {
 		}
 
 		// flatten two dimensional array
-        $events = call_user_func_array('array_merge', $events);
+        if (!empty($events))
+            $events = call_user_func_array('array_merge', $events);
 
 		// restore previously set calendar
         if (isset($current_calendar))
@@ -439,7 +440,8 @@ class SimpleCalDAVClient {
         }
 
         // flatten two dimensional array
-        $todos = call_user_func_array('array_merge', $todos);
+        if (!empty($todos))
+            $todos = call_user_func_array('array_merge', $todos);
 
         // restore previously set calendar
         if (isset($current_calendar))
