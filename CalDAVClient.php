@@ -1065,7 +1065,7 @@ EOFILTER;
    *
    * @param string    $href         The href from a call to GetEvents or GetTodos etc.
    *
-   * @return string The iCalendar of the calendar entry
+   * @return array The iCalendar of the calendar entry
    */
   function GetEntryByHref( $href ) {
       //$href = str_replace( rawurlencode('/'),'/',rawurlencode($href));
