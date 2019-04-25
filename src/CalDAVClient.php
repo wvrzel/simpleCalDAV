@@ -134,6 +134,11 @@ class CalDAVClient {
                   CURLOPT_SSL_VERIFYPEER => FALSE
                   ));
 
+      // Define Proxy
+      if(isset($options['proxy_host'])) {
+        curl_setopt($this->ch, CURLOPT_PROXY, $options['proxy_host']); 
+      }
+                        
       $this->full_url = $base_url;
       $this->first_url_part = $matches[1];
   }

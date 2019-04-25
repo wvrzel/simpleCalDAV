@@ -60,11 +60,11 @@ class SimpleCalDAVClient {
 	 * @throws CalDAVException
 	 * For debugging purposes, just sorround everything with try { ... } catch (Exception $e) { echo $e->__toString(); }
 	 */
-	function connect ( $url, $user, $pass )
+	function connect ( $url, $user, $pass, $options=[] )
 	{
 
 		//  Connect to CalDAV-Server and log in
-		$client = new CalDAVClient($url, $user, $pass);
+		$client = new CalDAVClient($url, $user, $pass, $options);
 
 		// Valid CalDAV-Server? Or is it just a WebDAV-Server?
 		if( ! $client->isValidCalDAVServer() )
