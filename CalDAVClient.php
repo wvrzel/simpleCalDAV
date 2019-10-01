@@ -516,7 +516,8 @@ class CalDAVClient {
    *
    * @return int The HTTP Result Code for the DELETE
    */
-  function DoDELETERequest( $url, $etag = null ) {
+  function DoDELETERequest( $url, $etag = null, $depth = 0 ) {
+      $this->SetDepth($depth);  
       $this->body = "";
 
       $this->requestMethod = "DELETE";
