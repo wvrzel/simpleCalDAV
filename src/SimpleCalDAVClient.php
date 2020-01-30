@@ -249,7 +249,7 @@ class SimpleCalDAVClient {
 	 * @throws CalDAVException
 	 * For debugging purposes, just sorround everything with try { ... } catch (Exception $e) { echo $e->__toString(); exit(-1); }
 	 */
-	function delete ( $href, $etag )
+	function delete ( $href, $etag = null )
 	{
 		// Connection and calendar set?
 		if(!isset($this->client)) throw new Exception('No connection. Try connect().');
@@ -259,12 +259,18 @@ class SimpleCalDAVClient {
 		$result = $this->client->GetEntryByHref($href);
 		if(count($result) == 0) throw new CalDAVException('Can\'t find '.$href.'on server', $this->client);
 		
-		// $etag correct?
-		if($result[0]['etag'] != $etag) { throw new CalDAVException('Wrong entity tag. The entity seems to have changed.', $this->client); }
+		if(isset($etag) and !empty($etag)) {
+			// $etag correct?
+			if($result[0]['etag'] != $etag) { throw new CalDAVException('Wrong entity tag. The entity seems to have changed.', $this->client); }
+		}
 	
 		// Do the deletion
-		$this->client->DoDELETERequest($href, $etag);
-	
+		if(isset($etag) and !empty($etag)) {
+			$this->client->DoDELETERequest($href, $etag);
+		} else {
+			$this->client->DoDELETERequest($href);
+		}
+		
 		// Deletion successfull?
 		if ( $this->client->GetHttpResultCode() != '200' and $this->client->GetHttpResultCode() != '204' )
 		{
