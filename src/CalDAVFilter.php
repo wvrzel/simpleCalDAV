@@ -51,10 +51,10 @@ class CalDAVFilter {
      * have the LOCATION-property.
 	 * 
 	 * Arguments:
-	 * @param $field The name of the property. For a full list of valid
+	 * @param string $field The name of the property. For a full list of valid
      *               property names see http://www.rfcreader.com/#rfc5545_line3622
      *               Note that the server might not support all of them.
-     * @param $inverse Makes the effect inverse: The resource must NOT include
+     * @param bool $inverse Makes the effect inverse: The resource must NOT include
      *                 the property $field
 	 */
     public function mustInclude ( $field, $inverse = FALSE ) {
@@ -74,11 +74,11 @@ class CalDAVFilter {
      * resource with "SUMMARY:This is a part of the".
 	 * 
 	 * Arguments:
-	 * @param $field The name of the property. For a full list of valid
+	 * @param string $field The name of the property. For a full list of valid
      *               property names see http://www.rfcreader.com/#rfc5545_line3622
      *               Note that the server might not support all of them.
-     * @param $substring Substring to match against the value of the property.
-     * @param $inverse Makes the effect inverse: The property value must NOT
+     * @param string $substring Substring to match against the value of the property.
+     * @param bool $inverse Makes the effect inverse: The property value must NOT
      *                 include the $substring
 	 */
     public function mustIncludeMatchSubstr ( $field, $substring, $inverse = FALSE ) {
@@ -93,9 +93,9 @@ class CalDAVFilter {
      * Only call this function once per CalDAVFilter-object!
 	 * 
 	 * Arguments:
-	 * @param $start The starting point of the time interval. Must be in the format yyyymmddThhmmssZ and should be in
+	 * @param string $start The starting point of the time interval. Must be in the format yyyymmddThhmmssZ and should be in
 	 *              	GMT. If omitted the value is set to -infinity.
-	 * @param $end The end point of the time interval. Must be in the format yyyymmddThhmmssZ and should be in
+	 * @param string $end The end point of the time interval. Must be in the format yyyymmddThhmmssZ and should be in
 	 *              	GMT. If omitted the value is set to +infinity.
 	 */
     public function mustOverlapWithTimerange ( $start = NULL, $end = NULL) {
@@ -111,6 +111,8 @@ class CalDAVFilter {
      * Transforms the filter to xml-code for the server. Used to pass as
      * argument for SimpleCalDAVClient->getCustomReport()
      *
+     * @return string
+     * 
      * Example:
      * $simpleCalDAVClient->getCustomReport($filter->toXML());
      *
