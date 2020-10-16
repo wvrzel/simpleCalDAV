@@ -12,7 +12,9 @@
  *
  */
 
-class CalDAVException extends Exception {
+namespace it\thecsea\simple_caldav_client;
+
+class CalDAVException extends \Exception {
 	private $requestHeader;
 	private $requestBody;
 	private $responseHeader;
@@ -29,7 +31,7 @@ class CalDAVException extends Exception {
     
     public function __toString() {
     	$string = '';
-    	$dom = new DOMDocument();
+    	$dom = new \DOMDocument();
     	$dom->preserveWhiteSpace = FALSE;
 		$dom->formatOutput = TRUE;
 		

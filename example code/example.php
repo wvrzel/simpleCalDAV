@@ -1,6 +1,8 @@
 <?php
 
-require_once('../SimpleCalDAVClient.php');
+require_once('../vendor/autoload.php');
+
+use it\thecsea\simple_caldav_client\SimpleCalDAVClient;
 
 $firstNewEvent = 'BEGIN:VCALENDAR
 PRODID:-//SomeExampleStuff//EN
@@ -114,7 +116,11 @@ try {
 	 * setCalendar()
 	 */
 	
-	$client->connect('http://yourServer/baikal/cal.php/calendars/yourUser/yourCalendar', 'username', 'password');
+    $client->connect('http://yourServer/baikal/cal.php/calendars/yourUser/yourCalendar', 'username', 'password');
+    /* With proxy 
+    $client->connect('http://yourServer/baikal/cal.php/calendars/yourUser/yourCalendar', 'username', 'password', ['proxy_host'=>'http://myproxyip:myproxyport']);
+    */
+
 	
 	$arrayOfCalendars = $client->findCalendars(); // Returns an array of all accessible calendars on the server.
 	

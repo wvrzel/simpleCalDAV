@@ -10,7 +10,8 @@
 *
 */
 
-require_once("XMLElement.php");
+namespace it\thecsea\simple_caldav_client\includes;
+
 
 /**
 * A class for XML Documents which will contain namespaced XML elements
