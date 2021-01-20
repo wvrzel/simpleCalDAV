@@ -229,9 +229,8 @@ class SimpleCalDAVClient {
 		$newEtag = $this->client->DoPUTRequest( $href, $new_data, $etag );
 		
 		// PUT-request successfull?
-		if ( $this->client->GetHttpResultCode() != '204' && $this->client->GetHttpResultCode() != '200' )
-		{
-			throw new CalDAVException('Recieved unknown HTTP status', $this->client);
+		if (!preg_match('/^20[0-9]/', $this->client->GetHttpResultCode())) {
+		    throw new CalDavException('Received wrong HTTP status', $this->client->GetHttpResultCode());
 		}
 		
 		return new CalDAVObject($href, $new_data, $newEtag);
