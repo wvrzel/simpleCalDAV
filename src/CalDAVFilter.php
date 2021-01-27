@@ -22,6 +22,8 @@
  *
  */
 
+namespace it\thecsea\simple_caldav_client;
+
 class CalDAVFilter {
 	private $resourceType;
 	private $mustIncludes = array();

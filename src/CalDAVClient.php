@@ -10,8 +10,11 @@
  * @package simpleCalDAV
  */
 
-require_once('CalDAVCalendar.php');
-require_once('include/XMLDocument.php');
+namespace it\thecsea\simple_caldav_client;
+
+use it\thecsea\simple_caldav_client\includes\XMLDocument;
+use it\thecsea\simple_caldav_client\includes\XMLElement;
+
 
 
 
@@ -58,6 +61,8 @@ class CalDAVClient {
   protected $httpResponse = ""; // http headers received
   protected $xmlResponse = "";  // xml received
   protected $httpResultCode = "";
+    private $httpResponseHeaders = '';
+    private $httpResponseBody = '';
 
   protected $parser; // our XML parser object
 

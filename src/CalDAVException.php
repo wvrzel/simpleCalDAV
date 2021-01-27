@@ -12,7 +12,9 @@
  *
  */
 
-class CalDAVException extends Exception {
+namespace it\thecsea\simple_caldav_client;
+
+class CalDAVException extends \Exception {
 	private $requestHeader;
 	private $requestBody;
 	private $responseHeader;
